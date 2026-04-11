@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
-import { addUser, getUser } from "../services/indexedDB";
+import { handleLogin, handleRegister } from "../services/Auth";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -28,7 +28,7 @@ const Login = () => {
     }
     
     try {
-      await addUser({
+      await handleRegister({
         name: formData.name,
         email: formData.email,
         password: formData.password
@@ -49,17 +49,7 @@ const Login = () => {
     }
     
     try {
-      const user = await getUser(formData.email);
-      
-      if (!user) {
-        setError("No account found with this email. Please register.");
-        return;
-      }
-      if (user.password !== formData.password) {
-        setError("Invalid email or password");
-        return;
-      }
-      
+      const user = await handleLogin(formData.email, formData.password);    
       setError("");
       setFormData({ name: "", email: "", password: "" });
       alert(`Welcome back, ${user.name}! You are logged in.`);
