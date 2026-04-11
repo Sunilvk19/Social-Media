@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
@@ -11,10 +12,19 @@ import Input from "../common/Input";
 import Button from "../common/Button";
 
 const Navbar = () => {
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navLinks = ["Home", "Explore", "Messages", "Setting"];
+  const navLinks = [
+    {name:"Home", path:'/home'},
+    { name:"Post", path:'/post'},
+    {name:"Explore", path:'/explore'},
+    {name:"Messages", path:'/messages'},
+  ];
+
   const [active, setActive] = useState("Home");
+
   return (
+    <>
     <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
       <div className="max-w-6xl mx-auto px-8 py-4 grid grid-cols-3 items-center gap-4">
         {/* Left Side: Logo */}
@@ -31,22 +41,17 @@ const Navbar = () => {
         <ul className="hidden md:flex items-center justify-center gap-8 text-sm font-medium text-gray-600 whitespace-nowrap justify-self-center">
           {navLinks.map((item) => (
             <li
-              key={item}
+              key={item.name}
               className={`font-bold cursor-pointer py-2 transition-colors ${
                 active === item
                   ? "text-indigo-600"
                   : "text-gray-600 hover:text-indigo-600"
               }`}
             >
-              <a
-                href={`#${item}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActive(item);
-                }}
-              >
-                {item}
-              </a>
+              <Link to={item.path} onClick={() => setActive(item.name)}>
+                {item.name}
+              </Link>
+              
             </li>
           ))}
         </ul>
@@ -136,6 +141,10 @@ const Navbar = () => {
         </div>
       )}
     </nav>
+    <div>
+      
+    </div>
+  </>
   );
 };
 

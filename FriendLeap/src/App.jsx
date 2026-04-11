@@ -1,15 +1,25 @@
 import React from 'react'
-import Navbar from './components/layout/Navbar'
-import Home from './Pages/Home'
-import Layout from './components/layout/Layout'
-import Login from './Pages/Login'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from './components/layout/Layout';
+import Home from './Pages/Home';
+import Explore from './Pages/Explore';
+import Messages from './Pages/Messages';
+import Post from './Pages/Post';
+import Login from './Pages/Login';
 
 const App = () => {
   return (
-    <Layout>
-      <Login />
-      {/* <Home /> */}
-    </Layout>
+    <>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Login/>} />
+        <Route path='/home' element={<Home/>} />
+        <Route path='/post' element={<Post/>} />
+        <Route path='/explore' element={<Explore/>} />
+        <Route path='/messages' element={<Messages/>} />
+      </Routes>
+    </BrowserRouter>
+    </>
   )
 }
 
