@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
@@ -12,48 +12,46 @@ import Input from "../common/Input";
 import Button from "../common/Button";
 
 const Navbar = () => {
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
   const navLinks = [
-    {name:"Home", path:'/home'},
-    { name:"Post", path:'/post'},
-    {name:"Explore", path:'/explore'},
-    {name:"Messages", path:'/messages'},
+    { name: "Home", path: "/home" },
+    { name: "Post", path: "/post" },
+    { name: "Explore", path: "/explore" },
+    { name: "Messages", path: "/messages" },
   ];
 
-  const [active, setActive] = useState("Home");
-
   return (
-    <>
+   <>
     <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
       <div className="max-w-6xl mx-auto px-8 py-4 grid grid-cols-3 items-center gap-4">
         {/* Left Side: Logo */}
-        <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity justify-self-start">
+        <Link
+          to="/home"
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity justify-self-start"
+        >
           <div className="w-8 h-8 rounded-xl bg-linear-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-200">
             F
           </div>
           <span className="text-xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-purple-600 tracking-tight hidden sm:block">
             FriendLeap
           </span>
-        </div>
+        </Link>
 
         {/* Center: Navigation */}
         <ul className="hidden md:flex items-center justify-center gap-8 text-sm font-medium text-gray-600 whitespace-nowrap justify-self-center">
-          {navLinks.map((item) => (
-            <li
-              key={item.name}
-              className={`font-bold cursor-pointer py-2 transition-colors ${
-                active === item
-                  ? "text-indigo-600"
-                  : "text-gray-600 hover:text-indigo-600"
-              }`}
-            >
-              <Link to={item.path} onClick={() => setActive(item.name)}>
-                {item.name}
-              </Link>
-              
-            </li>
-          ))}
+          {navLinks.map((item) => {
+            const isActive = location.pathname.startsWith(item.path);
+            return (
+              <li key={item.name}
+              className={`font-bold transition-colors ${isActive ? "text-indigo-600" : "text-gray-600 hover:text-indigo-600"}`}
+              >
+                <Link to={item.path} className="py-2 inline-block">
+                {item.name}</Link>
+              </li>
+            )
+          })}
         </ul>
 
         {/* Right Side: Search & Profile */}
@@ -116,35 +114,31 @@ const Navbar = () => {
           />
 
           <ul className="flex flex-col gap-3 text-sm font-medium text-gray-600">
-            {navLinks.map((card) => (
-              <li
-                key={card}
-                className={`transition-colors cursor-pointer block rounded-md px-3 py-2 font-medium ${
-                  active === card
-                    ? "text-indigo-600 bg-indigo-50 font-semibold"
-                    : "hover:text-indigo-600 hover:bg-gray-50"
-                }`}
-              >
-                <a
-                  href={`#${card}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setActive(card);
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  {card}
-                </a>
-              </li>
-            ))}
+            {navLinks.map((item) => {
+              const isActive = location.pathname.startsWith(item.path);
+
+              return (
+                <li key={item.name}>
+                  <Link
+                    to={item.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`transition-colors block rounded-md px-3 py-2 font-medium ${
+                      isActive
+                        ? "text-indigo-600 bg-indigo-50 font-semibold"
+                        : "hover:text-indigo-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
     </nav>
-    <div>
-      
-    </div>
-  </>
+    <div className="h-[73px]"></div>
+   </>
   );
 };
 

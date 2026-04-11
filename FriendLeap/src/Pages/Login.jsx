@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 import { handleLogin, handleRegister } from "../services/Auth";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
@@ -53,8 +55,9 @@ const Login = () => {
       setError("");
       setFormData({ name: "", email: "", password: "" });
       alert(`Welcome back, ${user.name}! You are logged in.`);
+      navigate('/home');
     } catch (err) {
-      setError("An error occurred trying to connect to the database.");
+      setError(err.message || "An error occurred trying to connect to the database.");
     }
   };
   return (
@@ -104,7 +107,6 @@ const Login = () => {
               onClick={isLogin ? handleLoginUser : handleRegisterUser}
               className="w-full py-3 mt-4"
             />
-            
             <div className="mt-6 text-center text-sm text-gray-600">
               {isLogin ? "Don't have an account? " : "Already have an account? "}
               <button

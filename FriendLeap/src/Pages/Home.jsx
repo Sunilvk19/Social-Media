@@ -1,15 +1,22 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
+import Post from "./Post";
+import { getMockUsers } from "../services/Mock";
 
 const Home = () => {
-  return (
+  const [users, setUsers] = useState([]);
+
+  useEffect(()=>{
+    const fetchUsersData = async () => {
+      const data = await getMockUsers();
+      setUsers(data);
+    };
+    fetchUsersData();
+  }, []);
+  return(
     <div>
-        <div className='flex mt-20 mx-10'>
-          <div>
-            <h1>Home</h1>
-          </div>
-        </div>
+      <Post />
     </div>
   )
-}
+};
 
-export default Home
+export default Home;
