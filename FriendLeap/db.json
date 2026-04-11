@@ -1,0 +1,17 @@
+{
+  "users": [
+    {
+      "name": "sunil",
+      "email": "sunil@gmail.com",
+      "password": "$2b$10$f2OKNEr3mxKGAKdb870dC.WnVMNeshpdQgBJKCpJ3o2HuDqcyZr/W",
+      "id": "1d1BrPMcrWQ"
+    },
+    {
+      "name": "dinesh",
+      "email": "abc@gmail.com",
+      "password": "$2b$10$Zm1t1bxl6//0Ld.6XbAndO6abeYTU9wf8/ZTphJGbCe603WDhidbK",
+      "id": "2sHI81fXf0M"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
