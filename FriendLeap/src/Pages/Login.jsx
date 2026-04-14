@@ -14,25 +14,7 @@ const Login = () => {
     password: "",
   });
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    localforage.getItem("user").then((user) => {
-      if (user) navigate("/home");
-    });
-    const handleStorageChange = (e) => {
-      if (e.key === "user") {
-        if (e.newValue) {
-          navigate("/home");
-        } else {
-          navigate("/");
-        }
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [navigate]);
+  const navigate = useNavigate();
   
   const handleRegisterUser = async () => {
     if (!formData.name.trim() || !formData.email.trim() || !formData.password) {
