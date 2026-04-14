@@ -6,6 +6,7 @@ import Explore from './Pages/Explore';
 import Messages from './Pages/Messages';
 import Post from './Pages/Post';
 import Login from './Pages/Login';
+import Profile from './Pages/Profile';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path='/post' element={<Layout><Post/></Layout>} />
         <Route path='/explore' element={<Layout><Explore/></Layout>} />
         <Route path='/messages' element={<Layout><Messages/></Layout>} />
+        <Route path='/profile' element={<Layout><Profile /></Layout>} />
       </Routes>
     </BrowserRouter>
     </>
