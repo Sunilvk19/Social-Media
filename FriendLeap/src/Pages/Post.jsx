@@ -24,7 +24,8 @@ function Post() {
   };
 
   return (
-    <div>
+    <div id='post'>
+      <h2> Upload post </h2>
       <div>
         <button onClick={handleForm}>Create</button>
 

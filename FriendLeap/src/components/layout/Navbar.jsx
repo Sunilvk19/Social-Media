@@ -16,7 +16,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navLinks = [
     {name:"Home", path:'/home'},
-    { name:"Post", path:'/post'},
+    {name:"Post", path:'/post'},
     {name:"Explore", path:'/explore'},
     {name:"Messages", path:'/messages'},
   ];
@@ -43,7 +43,7 @@ const Navbar = () => {
             <li
               key={item.name}
               className={`font-bold cursor-pointer py-2 transition-colors ${
-                active === item
+                active === item.name
                   ? "text-indigo-600"
                   : "text-gray-600 hover:text-indigo-600"
               }`}
@@ -51,7 +51,6 @@ const Navbar = () => {
               <Link to={item.path} onClick={() => setActive(item.name)}>
                 {item.name}
               </Link>
-              
             </li>
           ))}
         </ul>

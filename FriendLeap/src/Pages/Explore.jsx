@@ -2,7 +2,10 @@ import React from 'react'
 
 const Explore = () => {
   return (
-    <div>Explore</div>
+    <div>
+      <h2> Explore </h2>
+      <h2> Explore </h2>
+    </div>
   )
 }
 

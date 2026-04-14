@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 import { addUser, getUser } from "../services/indexedDB";
+import { useNavigate } from "react-router-dom";
+
+
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,6 +14,7 @@ const Login = () => {
     password: "",
   });
   const [error, setError] = useState("");
+  const navigate = useNavigate();
   
   const handleRegisterUser = async () => {
     if (!formData.name.trim() || !formData.email.trim() || !formData.password) {
@@ -63,6 +67,8 @@ const Login = () => {
       setError("");
       setFormData({ name: "", email: "", password: "" });
       alert(`Welcome back, ${user.name}! You are logged in.`);
+      navigate("/home");
+
     } catch (err) {
       setError("An error occurred trying to connect to the database.");
     }
