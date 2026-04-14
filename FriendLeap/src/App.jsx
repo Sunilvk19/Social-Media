@@ -1,11 +1,11 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from './components/layout/Layout';
 import Home from './Pages/Home';
 import Explore from './Pages/Explore';
 import Messages from './Pages/Messages';
 import Post from './Pages/Post';
 import Login from './Pages/Login';
+import Layout from './components/layout/Layout'
 
 const App = () => {
   return (

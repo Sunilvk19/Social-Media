@@ -13,6 +13,7 @@ const Login = () => {
     password: "",
   });
   const [error, setError] = useState("");
+  const navigate = useNavigate();
   
   const handleRegisterUser = async () => {
     if (!formData.name.trim() || !formData.email.trim() || !formData.password) {
