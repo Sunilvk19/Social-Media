@@ -1,12 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
-import { addUser, getUser } from "../services/indexedDB";
-import { useNavigate } from "react-router-dom";
-
-
+import { handleLogin, handleRegister } from "../services/Auth";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
@@ -32,7 +31,7 @@ const Login = () => {
     }
     
     try {
-      await addUser({
+      await handleRegister({
         name: formData.name,
         email: formData.email,
         password: formData.password
@@ -53,24 +52,13 @@ const Login = () => {
     }
     
     try {
-      const user = await getUser(formData.email);
-      
-      if (!user) {
-        setError("No account found with this email. Please register.");
-        return;
-      }
-      if (user.password !== formData.password) {
-        setError("Invalid email or password");
-        return;
-      }
-      
+      const user = await handleLogin(formData.email, formData.password);    
       setError("");
       setFormData({ name: "", email: "", password: "" });
       alert(`Welcome back, ${user.name}! You are logged in.`);
-      navigate("/home");
-
+      navigate('/home');
     } catch (err) {
-      setError("An error occurred trying to connect to the database.");
+      setError(err.message || "An error occurred trying to connect to the database.");
     }
   };
   return (
@@ -120,7 +108,6 @@ const Login = () => {
               onClick={isLogin ? handleLoginUser : handleRegisterUser}
               className="w-full py-3 mt-4"
             />
-            
             <div className="mt-6 text-center text-sm text-gray-600">
               {isLogin ? "Don't have an account? " : "Already have an account? "}
               <button
