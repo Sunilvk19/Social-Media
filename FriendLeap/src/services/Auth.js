@@ -1,5 +1,12 @@
 import axios from "axios";
 import bcrypt from "bcryptjs";
+import localforage, { config } from "localforage";
+
+
+const CACHE_TTL = 5 * 60 * 1000;
+const getCacheKey = (config) => {
+    return `${config.url}?.${JSON.stringify(config.params || {})}`
+}
 
 const API = axios.create({
      baseURL: "http://localhost:5000",
@@ -7,20 +14,59 @@ const API = axios.create({
         "content-type" : "application/json",
     }
 });
+API.interceptors.request.use(async (config)=>{
+    if( config.method !== "get" || !config.cache ) return config;
+
+    const key = getCacheKey(config);
+    const cached = await localforage.getItem(key);
+    console.log(cached)
+    if(cached){
+        const { data, expiry } = cached;
+        if(expiry > Date.now()){
+            return Promise.reject({
+                isCached: true,
+                data,
+            });
+        }else{
+            await localforage.removeItem(key);
+        }
+    }
+    return config;
+});
+
+API.interceptors.response.use( async (response)=>{
+    const { config } = response;
+    if(config.method === "get" && config.cache ){
+        const key = getCacheKey(config);
+
+        await localforage.setItem(key, {
+            data: response.data,
+            expiry: Date.now() + CACHE_TTL,
+        });
+    }
+    return response;
+},
+    async (error) => {
+        if(error.isCached){
+            return Promise.resolve({
+                data: error.data,
+            })
+        }
+        return Promise.reject(error);
+    }
+);
 
 export const handleRegister = async (formData) => {
     try {
-        // bcrypt functions return Promises, so they must be awaited
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(formData.password, salt);
         
-        // It's a best practice to create a new object rather than mutating the parameter
         const finalData = { ...formData, password: hash };
         
         const response = await API.post("/users", finalData);
         const saveToUser = { ...response.data }
         delete saveToUser.password;
-        localStorage.setItem("user", JSON.stringify(saveToUser));
+        await localforage.setItem("user", JSON.stringify(saveToUser));
         return saveToUser;
     } catch (error) {
         throw new Error("Failed to register");
@@ -31,22 +77,19 @@ export const handleLogin = async (email, password) => {
     try {
         const response = await API.get("/users", { params: { email }});
         if(response.data.length === 0) {
-            // Throw an error so the frontend catch block handles it
             throw new Error("No user found with this email");
         }
         
         const user = response.data[0];
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if(!isPasswordValid){
-            // Throw an error so the frontend catch block handles it
             throw new Error("Invalid Password");
         }
         const userToSave = { ...user };
         delete userToSave.password;
-        localStorage.setItem("user", JSON.stringify(userToSave))
+        await localforage.setItem("user", JSON.stringify(userToSave))
         return user;
     } catch (error) {
-        // Rethrow custom errors directly so your UI can display the message
         if (error.message === "No user found with this email" || error.message === "Invalid Password") {
             throw error;
         }
@@ -55,5 +98,5 @@ export const handleLogin = async (email, password) => {
 }
 
 export const handleLogout = async () => {
-    localStorage.removeItem("user");
+   await localforage.removeItem("user");
 }
