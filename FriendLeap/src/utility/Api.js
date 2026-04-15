@@ -1,4 +1,4 @@
-export const BASE_URL = "https://dummy-json.mock.beeceptor.com";
+export const BASE_URL = "https://dummyjson.com";
 
 export const HTTP_METHOD = {
     GET: "GET",
