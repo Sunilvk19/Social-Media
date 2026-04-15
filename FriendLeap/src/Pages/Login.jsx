@@ -6,7 +6,6 @@ import { handleLogin, handleRegister } from "../services/Auth";
 import localforage from "localforage";
 
 const Login = () => {
-  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
