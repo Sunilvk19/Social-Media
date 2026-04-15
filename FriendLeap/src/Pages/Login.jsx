@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 import { handleLogin, handleRegister } from "../services/Auth";
-import localforage from "localforage";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,7 +13,7 @@ const Login = () => {
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  
+
   const handleRegisterUser = async () => {
     if (!formData.name.trim() || !formData.email.trim() || !formData.password) {
       setError("Please fill all the fields");
@@ -115,7 +114,6 @@ const Login = () => {
                 onChange={handleChange}
               />
             </div>
-
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-1"
@@ -132,9 +130,7 @@ const Login = () => {
                 onChange={handleChange}
               />
             </div>
-
             {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-
             <Button
               type="submit"
               label={isLogin ? "Sign In" : "Register"}
@@ -144,7 +140,7 @@ const Login = () => {
               {isLogin
                 ? "Don't have an account? "
                 : "Already have an account? "}
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   setIsLogin(!isLogin);
@@ -154,7 +150,7 @@ const Login = () => {
                 className="text-indigo-600 hover:text-indigo-500 font-semibold"
               >
                 {isLogin ? "Sign Up" : "Sign In"}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

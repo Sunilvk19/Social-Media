@@ -25,5 +25,7 @@
       "id": "m7DBWB7_usQ"
     }
   ],
+  "messages": [],
+  "posts": [],
   "$schema": "./node_modules/json-server/schema.json"
 }

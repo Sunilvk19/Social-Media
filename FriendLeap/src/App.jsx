@@ -6,10 +6,10 @@ import Messages from './Pages/Messages';
 import Post from './Pages/Post';
 import Login from './Pages/Login';
 import Layout from './components/layout/Layout'
+import Profile from './Pages/Profile';
 
 const App = () => {
   return (
-    <>
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Login/>} />
@@ -20,8 +20,7 @@ const App = () => {
         <Route path='/profile' element={<Layout><Profile /></Layout>} />
       </Routes>
     </BrowserRouter>
-    </>
   )
 }
 
-export default App
+export default App;
