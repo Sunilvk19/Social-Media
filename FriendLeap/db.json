@@ -25,6 +25,5 @@
       "password": "$2b$10$Dm66is1IRFz53fq7AfU9p.XNpCuTtfdenmfSje7QSBAgnFKw/IYq6"
     }
   ],
-  "posts": [],
   "$schema": "./node_modules/json-server/schema.json"
 }
