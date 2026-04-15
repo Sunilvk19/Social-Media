@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
@@ -11,6 +11,7 @@ const Login = () => {
     email: "",
     password: "",
   });
+
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -29,6 +30,7 @@ const Login = () => {
       return;
     }
 
+
     try {
       await handleRegister({
         name: formData.name,
@@ -43,10 +45,12 @@ const Login = () => {
       setError("Failed to register. Please try again");
     }
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  
   const handleLoginUser = async () => {
     if (!formData.email.trim() || !formData.password) {
       setError("Please enter your email and password");
@@ -55,6 +59,7 @@ const Login = () => {
 
     try {
       const user = await handleLogin(formData.email, formData.password);
+      await localforage.setItem("Current_user", user);
       setError("");
       setFormData({ name: "", email: "", password: "" });
       alert(`Welcome back, ${user.name}! You are logged in.`);
