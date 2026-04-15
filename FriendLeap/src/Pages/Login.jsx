@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 import { handleLogin, handleRegister } from "../services/Auth";
-import localforage from "localforage";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -144,7 +143,7 @@ const Login = () => {
               {isLogin
                 ? "Don't have an account? "
                 : "Already have an account? "}
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   setIsLogin(!isLogin);
@@ -154,7 +153,7 @@ const Login = () => {
                 className="text-indigo-600 hover:text-indigo-500 font-semibold"
               >
                 {isLogin ? "Sign Up" : "Sign In"}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

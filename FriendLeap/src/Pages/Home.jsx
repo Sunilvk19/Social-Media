@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { getMockUsers } from "../services/Mock";
 import Button from "../components/common/Button";
 import Post from "./Post";
-import { Navigate } from "react-router-dom";
 
 const Home = () => {
   const [users, setUsers] = useState([]);
@@ -17,11 +16,14 @@ const Home = () => {
     };
     fetchUsersData();
   }, []);
+
   const handleNewPost = (newPost) => {
     setPosts((prev) => [newPost, ...prev]);
   }
+
   const currentUser = users.length > 0 ? users[0] : null;
   const section = ["News", "Message", "Event", "Group"];
+  
   return (
     <>
       {!loading && (
@@ -36,7 +38,7 @@ const Home = () => {
                       <div className="w-22 h-22 rounded-full border-4 border-white bg-white overflow-hidden shadow-md">
                         <div className="w-full h-full bg-amber-200 flex items-center justify-center text-4xl font-extrabold text-indigo-500 shadow-inner">
                           {users.length > 0
-                            ? users[0].name.charAt(0).toUpperCase()
+                            ? users[8].name.charAt(0).toUpperCase()
                             : "U"}
                         </div>
                       </div>
