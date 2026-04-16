@@ -76,27 +76,29 @@ const Navbar = () => {
               placeholder="Search..."
               className="pl-10 pr-4 py-2 w-full bg-gray-50 border border-gray-200 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all shadow-inner"
             />
-            {notification && (<span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />)}
-            <Button
-              icon={faBell}
-              variant={"ghost"}
-              size="sm"
-              onClick={handleNotification}
-              aria-label="Notifications"
-              className="relative p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors focus:outline-none"
-            />
+            <div className="relative">
+              {notification && (<span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full z-10" />)}
+              <Button
+                icon={faBell}
+                variant={"ghost"}
+                size="sm"
+                onClick={handleNotification}
+                aria-label="Notifications"
+                className="relative p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors focus:outline-none"
+              />
+            </div>
 
             <div className="h-8 w-px bg-gray-200 hidden sm:block"></div>
 
-            <Button
-              icon={faUser}
-              variant={"ghost"}
-              size="sm"
-              className="hover:bg-gray-100 cursor-pointer rounded-full"
-              label={"profile"}
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-            />
-            <div className="relative ml-3">
+            <div className="relative">
+              <Button
+                icon={faUser}
+                variant={"ghost"}
+                size="sm"
+                className="hover:bg-gray-100 cursor-pointer rounded-full"
+                label={"profile"}
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+              />
               {isProfileOpen && (
                 <div className="absolute right-0 z-10 mt-2 flex flex-col w-48 py-1 bg-white rounded-lg shadow-lg border border-gray-100 cursor-pointer">
                   <Link
@@ -113,7 +115,7 @@ const Navbar = () => {
                   </Link>
                   <Button
                     onClick={handleLogoutClick}
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                    className="w-full text-left block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     Logout
                   </Button>
@@ -130,14 +132,6 @@ const Navbar = () => {
               ) : (
                 <FontAwesomeIcon icon={faBars} />
               )}
-            </Button>
-            <Button
-              onClick={handleLogoutClick}
-              variant="danger"
-              size="sm"
-              className="rounded-full px-5 font-semibold tracking-wide hover:cursor-pointer shadow-md hover:shadow-lg transition-all"
-            >
-              LogOut
             </Button>
           </div>
         </div>
