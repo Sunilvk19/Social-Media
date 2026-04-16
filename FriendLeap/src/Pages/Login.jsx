@@ -12,6 +12,7 @@ const Login = () => {
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -30,8 +31,6 @@ const Login = () => {
       setError("Password must be at least 6 characters long");
       return;
     }
-
-
     try {
       await handleRegister({
         name: formData.name,
@@ -71,6 +70,9 @@ const Login = () => {
       );
     }
   };
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  }
   return (
     <div>
       <div className="flex items-center justify-center h-screen bg-gray-50">
@@ -100,6 +102,7 @@ const Login = () => {
                   placeholder={"Enter your name"}
                   value={formData.name}
                   onChange={handleChange}
+                  icon={faUser}
                 />
               </div>
             )}
@@ -118,6 +121,7 @@ const Login = () => {
                 placeholder={"Enter your email"}
                 value={formData.email}
                 onChange={handleChange}
+                icon={faEnvelope}
               />
             </div>
             <div>
@@ -128,12 +132,14 @@ const Login = () => {
                 Password
               </label>
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
                 placeholder={"Enter your password"}
                 value={formData.password}
                 onChange={handleChange}
+                icon={showPassword ? faEye : faEyeSlash}
+                onIconClick={handleTogglePassword}
               />
             </div>
             {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
@@ -153,7 +159,7 @@ const Login = () => {
                   setError("");
                   setFormData({ name: "", email: "", password: "" });
                 }}
-                className="text-indigo-600 hover:text-indigo-500 font-semibold"
+                className="text-gray-800 hover:text-red-500 font-semibold"
               >
                 {isLogin ? "Sign Up" : "Sign In"}
               </Button>

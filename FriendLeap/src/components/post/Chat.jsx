@@ -9,47 +9,82 @@ const Chat = () => {
 
   useEffect(() => {
     const loadUser = async () => {
-      const user = await localforage.getItem("user");
+      const user = await localforage.getItem("Current_user");
       setCurrentUser(user);
     };
     loadUser();
   }, []);
+
   useEffect(() => {
-      const fetchMessages = async () => {
-        try{
-            const res = await axios.get("http://localhost:5000/messages");
-            setMessages(res.data);
-        } catch (error){
-            console.error(error.message);
-        }
-      };
-      fetchMessages();
+    const fetchMessages = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/messages");
+        setMessages(res.data);
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
+    fetchMessages();
+
+    const intervalId = setInterval(fetchMessages, 3000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleMessages = async (text) => {
-    if (!text.trim() || !currentUser) return;
+    console.log("1. Sending message: ", text);
+    console.log("2. Current User data is: ", currentUser);
+
+    if (!text.trim()) {
+      console.log("Aborting: Text is empty");
+      return;
+    }
+
+    if (!currentUser) {
+      alert("Error: You are not properly logged in! currentUser is null.");
+      console.error("Aborting: currentUser is null. Did you login first?");
+      return;
+    }
+
     const newMessages = {
-        text: text,
-        senderId: currentUser.id,
-        receiverId: "user",
-        timestamp: new Date().toISOString(),
+      text: text,
+      senderId: currentUser.id,
+      receiverId: "group",
+      timestamp: new Date().toISOString(),
     };
-    try{
-        const res = await axios.post("http://localhost:5000/messages", newMessages);
-        setMessages([...messages, res.data]);
-    }catch(er){
-        console.error(er.message);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/messages",
+        newMessages,
+      );
+      console.log("3. Message successfully sent to DB:", res.data);
+      setMessages([...messages, res.data]);
+    } catch (er) {
+      console.error("4. Error from JSON server:", er.message);
+    }
+  };
+
+  const handleClearMessage = async () => {
+    try {
+      const deleteRequest = messages.map((mes) =>
+        axios.delete(`http://localhost:5000/messages/${mes.id}`),
+      );
+      await Promise.all(deleteRequest);
+      setMessages([]);
+    } catch (error) {
+      console.error("Error clearing message", error.message);
     }
   };
   return (
-    <>
-        <Messages 
-        currentUser={currentUser}
-        messages={messages}
-        onSendMessage={handleMessages}
-        />
-    </>
-  )
+    <Messages
+      currentUser={currentUser}
+      messages={messages}
+      onSendMessage={handleMessages}
+      onClearMessage={handleClearMessage}
+    />
+  );
 };
 
 export default Chat;

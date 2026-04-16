@@ -11,7 +11,7 @@ function Post({ onPostCreated }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    localforage.getItem("user").then((user)=>{
+    localforage.getItem("Current_user").then((user)=>{
       setUser(user);
     });
   }, []);
