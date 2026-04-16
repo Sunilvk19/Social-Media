@@ -10,6 +10,13 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
   const [count, setCount] = useState(4);
+  const [isFollowing, setIsFollowing] = useState({});
+
+  const handleFollowing = (id)=>{
+    setIsFollowing(prev=> ({
+      ...prev, [id]: !prev[id]
+    }));
+  }
 
   useEffect(() => {
     const fetchUsersData = async () => {
@@ -31,8 +38,6 @@ const Home = () => {
   const handleNewPost = (newPost) => {
     setPosts((prev) => [newPost, ...prev]);
   };
-
-  const section = ["News", "Message", "Event", "Group"];
 
   const handleSuggestion = ()=>{
     setCount(users.length);
@@ -90,19 +95,6 @@ const Home = () => {
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-4">
-                  <ul className="space-y-1">
-                    {section.map((item, idx) => (
-                      <li key={item}>
-                        <Button
-                          className={`w-full text-left px-5 py-3.5 rounded-xl font-semibold transition-all duration-300  ${idx === 0 ? "bg-indigo-50/80 text-cyan-700 shadow-sm" : "text-black-600 hover:bg-gray-50 hover:text-cyan-500"}`}
-                        >
-                          {item}
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               </div>
               <div className="flex-1 flex flex-col space-y-6">
@@ -168,8 +160,8 @@ const Home = () => {
                           @{user.username}
                         </span>
 
-                        <Button className="w-full py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-gray-600 transition-all">
-                          Follow
+                        <Button onClick={()=> handleFollowing(user.id)} className="w-full py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-gray-600 transition-all">
+                          {isFollowing[user.id]? "Following" : "Follow"}
                         </Button>
                       </div>
                     ))}

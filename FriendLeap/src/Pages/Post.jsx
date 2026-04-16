@@ -34,7 +34,7 @@ function Post({ onPostCreated }) {
     const newPost = {
       id: Date.now(),
       image: image,
-      name: name,
+      name: user.name,
       likes: 0,
       comments: 0,
     };
@@ -43,6 +43,11 @@ function Post({ onPostCreated }) {
       onPostCreated(newPost);
     }
 
+    localforage.getItem("posts").then((posts)=>{
+      const updated = posts ? [...posts, newPost] : [newPost];
+      localforage.setItem("posts", updated);
+    })
+    
     // localforage.getItem("posts").then((posts)=>{
     //   const updated = posts ? [...posts, newPost] : [newPost];
     //   localforage.setItem("posts", updated);
