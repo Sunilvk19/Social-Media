@@ -152,13 +152,13 @@ const Home = () => {
                           />
                         </div>
 
-                        <h3 className="text-sm font-semibold text-gray-800 truncate">
+                        <span className="text-sm font-semibold text-gray-800 truncate">
                           {user.firstName} {user.lastName}
-                        </h3>
+                        </span>
 
-                        <p className="text-xs text-gray-500 mb-3">
+                        <span className="text-xs text-gray-500 mb-3">
                           @{user.username}
-                        </p>
+                        </span>
 
                         <Button onClick={()=> handleFollowing(user.id)} className="w-full py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-gray-600 transition-all">
                           {isFollowing[user.id]? "Following" : "Follow"}

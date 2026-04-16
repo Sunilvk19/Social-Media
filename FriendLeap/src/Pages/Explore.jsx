@@ -1,12 +1,71 @@
-import React from 'react'
+import axios from "axios";
+import localforage from "localforage";
+import React, { useEffect, useState } from "react";
+import { getMockUsers } from "../services/Mock";
 
 const Explore = () => {
-  return (
-    <div>
-      <h2> Explore </h2>
-      <h2> Explore </h2>
-    </div>
-  )
-}
+  const [currentUser, setCurrentUser] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState([]);
 
-export default Explore
+  // useEffect(()=>{
+  //   const fetchData = async ()=>{
+  //     try{
+  //       // const response = await axios.get("http://localhost:5000/users");
+  //       const response = await localforage.getItem("users");
+  //       setUser(response);
+  //       setLoading(false);
+  //     }catch(err){
+  //       console.log(err);
+  //       setLoading(false);
+  //     }
+  //   }
+  //   fetchData();
+  // },[]);
+
+  useEffect(() => {
+    const fetchUsersData = async () => {
+      const data = await localforage.getItem("Current_user");
+      setCurrentUser(data);
+      setLoading(false);
+    };
+    fetchUsersData();
+  }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const data1 = await getMockUsers();
+      setUsers(data1.users);
+    };
+    fetchUsers();
+  }, []);
+  return (
+    <div className="min-h-screen bg-gray-50 p-4">
+      <span className="text-2xl font-bold text-gray-800">Explore</span>
+      <div className="grid grid-cols-4 gap-4 mt-4">
+        {loading && <div className="">Loading......</div>},
+        {!loading &&
+          users.map((user) => (
+            <div key={user.id} className="bg-white p-4 rounded-2xl shadow-md">
+              <div className="relative group">
+                <img
+                  src={
+                    user.image ||
+                    "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                  }
+                  alt="user-image"
+                  className="w-8 h-8 rounded-full object-cover shadow-lg hover:opacity-90 transition"
+                />
+                <div className="flex items-center justify-between top-0 right-0 gap-2">
+                  <span className="text-xs font-semibold text-gray-500">{user.name}</span>
+                  <span className="text-xs font-semibold text-gray-500">{user.username}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+      </div>
+    </div>
+  );
+};
+
+export default Explore;

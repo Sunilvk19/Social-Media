@@ -15,14 +15,19 @@ const Input = ({ placeholder,
   disabled = false,
   required = false,
   autoFocus = false,
+  onIconClick,
+  onKeyDown,
+  endAdornment,
 }) => {
     const inputClass = `w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all shadow-inner
-     ${className || ''} ${icon ? 'pl-10' : ''}`;
+     ${className || ''} ${icon ? 'pl-10' : 'pl-4'} ${endAdornment ? 'pr-10' : 'pr-4'}`;
+
+    
     
   return (  
     <div className={`relative group ${containerClassName || ''}`}>
       {icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none hover:cursor-pointer">
               <FontAwesomeIcon icon={icon} className="h-4 w-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors hover:cursor-pointer" />
             </div>
       )}
@@ -37,7 +42,14 @@ const Input = ({ placeholder,
         disabled={disabled}
         required={required}
         autoFocus={autoFocus}
+        onClick={onIconClick}
+        onKeyDown={onKeyDown}
         />
+        {endAdornment && (
+          <div
+          className='flex items-center absolute inset-y-0 right-0 pr-3 pt-1 pb-1'
+          > {endAdornment} </div>
+        )}
     </div>
   )
 }
