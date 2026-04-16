@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 import { handleLogin, handleRegister } from "../services/Auth";
+import localforage from "localforage";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -29,8 +30,6 @@ const Login = () => {
       setError("Password must be at least 6 characters long");
       return;
     }
-
-
     try {
       await handleRegister({
         name: formData.name,
