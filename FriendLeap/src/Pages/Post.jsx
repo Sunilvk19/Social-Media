@@ -28,20 +28,25 @@ function Post({ onPostCreated }) {
 
   const handleSubmit = () => {
     if (!image) return;
+    if (!user) return;
+
     const newPost = {
       id: Date.now(),
       image: image,
-      name: name,
+      name: user.name,
       likes: 0,
       comments: 0,
     };
+
     if (onPostCreated) {
       onPostCreated(newPost);
     }
+
     localforage.getItem("posts").then((posts)=>{
       const updated = posts ? [...posts, newPost] : [newPost];
       localforage.setItem("posts", updated);
     })
+    
     setImage(null);
     setName("");
     setForm(false);
