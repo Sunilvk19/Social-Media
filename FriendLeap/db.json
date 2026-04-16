@@ -17,15 +17,9 @@
       "name": "Dinesh Hadimani",
       "email": "dinesh1@gmail.com",
       "password": "$2b$10$SwW5rKDQcf6EbUeXDoib1uIe..M24fRY6enMqQbyXV3WqMu/DAQeS"
-    },
-    {
-      "id": "61e1",
-      "name": "Sunil VK",
-      "email": "maha@gmail.com",
-      "password": "$2b$10$Dm66is1IRFz53fq7AfU9p.XNpCuTtfdenmfSje7QSBAgnFKw/IYq6"
     }
   ],
-  "messages": [],
+  "messages" : [],
   "posts": [],
   "$schema": "./node_modules/json-server/schema.json"
 }

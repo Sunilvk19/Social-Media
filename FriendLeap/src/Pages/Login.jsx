@@ -4,7 +4,6 @@ import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 import { handleLogin, handleRegister } from "../services/Auth";
 import localforage from "localforage";
-import { faEnvelope, faEye, faEyeSlash, faUser } from "@fortawesome/free-solid-svg-icons";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
