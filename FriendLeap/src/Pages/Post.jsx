@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import localforage from "localforage";
+import axios from "axios";
 
 function Post({ onPostCreated }) {
   const [image, setImage] = useState(null);
@@ -28,6 +29,8 @@ function Post({ onPostCreated }) {
 
   const handleSubmit = () => {
     if (!image) return;
+    if (!user) return;
+
     const newPost = {
       id: Date.now(),
       image: image,
@@ -35,13 +38,18 @@ function Post({ onPostCreated }) {
       likes: 0,
       comments: 0,
     };
+
     if (onPostCreated) {
       onPostCreated(newPost);
     }
-    localforage.getItem("posts").then((posts)=>{
-      const updated = posts ? [...posts, newPost] : [newPost];
-      localforage.setItem("posts", updated);
-    })
+
+    // localforage.getItem("posts").then((posts)=>{
+    //   const updated = posts ? [...posts, newPost] : [newPost];
+    //   localforage.setItem("posts", updated);
+    // })
+
+    axios.post("http://localhost:3001/posts", newPost);
+
     setImage(null);
     setName("");
     setForm(false);
@@ -83,7 +91,7 @@ function Post({ onPostCreated }) {
               <div className="py-8">
                 <label className="text-sm font-semibold text-blue-600 cursor-pointer hover:underline">
                   Click to upload an image
-                  <input
+                  <Input
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
