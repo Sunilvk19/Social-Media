@@ -13,35 +13,35 @@ const Home = () => {
 
   useEffect(() => {
     const fetchUsersData = async () => {
-      const data = await localforage.getItem("Current_user");
-      setcurrentUser(data);
-      setLoading(false);
+      try {
+        const [userData, mockData, postsData] = await Promise.all([
+          localforage.getItem("Current_user"),
+          getMockUsers(),
+          localforage.getItem("posts"),
+        ]);
+        if (userData) setcurrentUser(userData);
+        if (mockData?.users) setUsers(mockData.users);
+        if (postsData) setPosts(postsData);
+      } catch (error) {
+        console.log("Error fetching data", error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchUsersData();
   }, []);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const data1 = await getMockUsers();
-      setUsers(data1.users);
-    };
-    fetchUsers();
-  }, []);
-
   const handleNewPost = (newPost) => {
     setPosts((prev) => [newPost, ...prev]);
   };
 
-  const section = ["News", "Message", "Event", "Group"];
-
-  const handleSuggestion = ()=>{
+  const handleSuggestion = () => {
     setCount(users.length);
-  }
+  };
 
   return (
     <>
       {!loading && (
-        <div className="min-h-[calc(100vh-74px)] bg-gray-50 pt-8 pb-5 font-sans">
+        <div className="min-h-screen bg-gray-50 pt-8 pb-5 font-sans">
           <div className="max-w-7/12xl mx-auto px-6 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row gap-8">
               <div className="hidden lg:block w-80 shrink-0 space-y-6 animate-in slide-in-from-left-8 duration-700">
@@ -91,19 +91,6 @@ const Home = () => {
                     </div>
                   </div>
                 </div>
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-4">
-                  <ul className="space-y-1">
-                    {section.map((item, idx) => (
-                      <li key={item}>
-                        <Button
-                          className={`w-full text-left px-5 py-3.5 rounded-xl font-semibold transition-all duration-300  ${idx === 0 ? "bg-indigo-50/80 text-cyan-700 shadow-sm" : "text-black-600 hover:bg-gray-50 hover:text-cyan-500"}`}
-                        >
-                          {item}
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </div>
               <div className="flex-1 flex flex-col space-y-6">
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-5 flex gap-4 overflow-x-auto hide-scrollbar snap-x">
@@ -126,6 +113,14 @@ const Home = () => {
                         key={post.id}
                         className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 overflow-hidden mt-6"
                       >
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold uppercase shadow-sm">
+                            {post.authorName ? post.authorName.charAt(0) : "U"}
+                          </div>
+                          <h3 className="font-bold text-gray-800">
+                            {post.authorName || "User"}
+                          </h3>
+                        </div>
                         {post.image && (
                           <img
                             src={post.image}

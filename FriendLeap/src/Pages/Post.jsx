@@ -11,7 +11,7 @@ function Post({ onPostCreated }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    localforage.getItem("Current_user").then((user)=>{
+    localforage.getItem("Current_user").then((user) => {
       setUser(user);
     });
   }, []);
@@ -19,40 +19,63 @@ function Post({ onPostCreated }) {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      const currentImageUrl = URL.createObjectURL(file);
+      setImage({
+        file: file,
+        url: currentImageUrl,
+      });
     }
+  };
+  const RemoveImage = () => {
+    if (image?.url) {
+      URL.revokeObjectURL(image.url);
+    }
+    setImage(null);
   };
 
   const handleForm = () => {
+    if(form){
+      RemoveImage();
+      setName("");
+    }
     setForm((prev) => !prev);
   };
 
-  const handleSubmit = () => {
-    if (!image) return;
+  const handleSubmit = async () => {
+    if (!image?.file) return;
     if (!user) return;
 
-    const newPost = {
-      id: Date.now(),
-      image: image,
-      name: name,
-      likes: 0,
-      comments: 0,
-    };
+    try {
+      const base65Image = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(image.file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
+      console.log(base65Image);
+      const newPost = {
+        id: Date.now().toString(),
+        userId: user.id,
+        authorName: user.name,
+        image: base65Image,
+        name: name,
+        like: 0,
+        comments: [],
+      };
+      const existingPosts = (await localforage.getItem("posts")) || [];
+      const updatedPosts = [newPost, ...existingPosts];
+      await localforage.setItem("posts", updatedPosts);
 
-    if (onPostCreated) {
-      onPostCreated(newPost);
+      if (onPostCreated) {
+        onPostCreated(newPost);
+      }
+      RemoveImage();
+      setName("");
+      setForm(false);
+    } catch (error) {
+      console.error("Failed to create Post", error);
+      alert("Failed to create post");
     }
-
-    // localforage.getItem("posts").then((posts)=>{
-    //   const updated = posts ? [...posts, newPost] : [newPost];
-    //   localforage.setItem("posts", updated);
-    // })
-
-    axios.post("http://localhost:3001/posts", newPost);
-
-    setImage(null);
-    setName("");
-    setForm(false);
   };
 
   return (
@@ -76,16 +99,16 @@ function Post({ onPostCreated }) {
             {image ? (
               <div className="relative">
                 <img
-                  src={image}
+                  src={image.url}
                   alt="preview"
                   className="w-full h-48 object-cover rounded-md"
                 />
-                <button
-                  onClick={() => setImage(null)}
+                <Button
+                  onClick={RemoveImage}
                   className="absolute top-2 right-2 bg-white text-gray-800 text-xs px-2 py-1 rounded shadow hover:bg-gray-100"
                 >
                   X
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="py-8">
@@ -102,7 +125,7 @@ function Post({ onPostCreated }) {
               </div>
             )}
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Caption
