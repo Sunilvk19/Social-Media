@@ -5,30 +5,41 @@ import Post from "./Post";
 import localforage from "localforage";
 
 const Home = () => {
-  const [currentUser, setcurrentUser] = useState([]);
+  const [currentUser, setcurrentUser] = useState({});
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
   const [count, setCount] = useState(4);
   const [isFollowing, setIsFollowing] = useState({});
 
-  const handleFollowing = (id)=>{
-    setIsFollowing(prev=> ({
-      ...prev, [id]: !prev[id]
-    }));
-  }
+  const handleFollowing = (id) => {
+    setIsFollowing((prev) => {
+      const updatedState = { ...prev, [id]: !prev[id] };
+      localforage.setItem("Following_state", updatedState);
+      return updatedState;
+    });
+  };
 
   useEffect(() => {
     const fetchUsersData = async () => {
       try {
-        const [userData, mockData, postsData] = await Promise.all([
-          localforage.getItem("Current_user"),
-          getMockUsers(),
-          localforage.getItem("posts"),
-        ]);
-        if (userData) setcurrentUser(userData);
+        const [userData, mockData, postsData, followingData, userProfile] =
+          await Promise.all([
+            localforage.getItem("Current_user"),
+            getMockUsers(),
+            localforage.getItem("posts"),
+            localforage.getItem("Following_state"),
+            localforage.getItem("User_Profile"),
+          ]);
+        if (userData) {
+          setcurrentUser({
+            ...userData,
+            image: userProfile?.image || null,
+          });
+        }
         if (mockData?.users) setUsers(mockData.users);
         if (postsData) setPosts(postsData);
+        if (followingData) setIsFollowing(followingData);
       } catch (error) {
         console.log("Error fetching data", error);
       } finally {
@@ -41,7 +52,7 @@ const Home = () => {
     setPosts((prev) => [newPost, ...prev]);
   };
 
-  const handleSuggestion = ()=>{
+  const handleSuggestion = () => {
     setCount(users.length);
   };
 
@@ -57,9 +68,19 @@ const Home = () => {
                   <div className="px-6 pb-6 relative">
                     <div className="flex justify-center -mt-12 mb-4">
                       <div className="w-22 h-22 rounded-full border-4 border-white bg-white overflow-hidden shadow-md">
-                        <div className="w-full h-full bg-amber-200 flex items-center justify-center text-4xl font-extrabold text-indigo-500 shadow-inner">
-                          {currentUser.name.charAt(0).toUpperCase()}
-                        </div>
+                        {currentUser?.image ? (
+                          <img
+                            src={currentUser.image}
+                            alt="User_Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-amber-200 flex items-center justify-center text-4xl font-extrabold text-indigo-500 shadow-inner">
+                            {currentUser?.name
+                              ? currentUser.name.charAt(0).toUpperCase()
+                              : "U"}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="text-center mb-4">
@@ -73,7 +94,7 @@ const Home = () => {
                     <div className="flex justify-between text-center pt-2">
                       <div className="group/stat cursor-pointer">
                         <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
-                          {currentUser?.posts || 0}
+                          {posts.filter(post => post.userId === currentUser?.id).length}
                         </p>
                         <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
                           Posts
@@ -81,7 +102,7 @@ const Home = () => {
                       </div>
                       <div className="group/stat cursor-pointer">
                         <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
-                          {currentUser?.followers || 0}
+                          {Object.values(isFollowing).filter(value => value === true).length}
                         </p>
                         <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
                           Followers
@@ -170,8 +191,11 @@ const Home = () => {
                           @{user.username}
                         </span>
 
-                        <Button onClick={()=> handleFollowing(user.id)} className="w-full py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-gray-600 transition-all">
-                          {isFollowing[user.id]? "Following" : "Follow"}
+                        <Button
+                          onClick={() => handleFollowing(user.id)}
+                          className="w-full py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-gray-600 transition-all"
+                        >
+                          {isFollowing[user.id] ? "Following" : "Follow"}
                         </Button>
                       </div>
                     ))}

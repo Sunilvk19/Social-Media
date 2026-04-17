@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import localforage from "localforage";
-import axios from "axios";
 
 function Post({ onPostCreated }) {
   const [image, setImage] = useState(null);
@@ -15,7 +14,7 @@ function Post({ onPostCreated }) {
       setUser(user);
     });
   }, []);
-
+  
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -52,11 +51,12 @@ function Post({ onPostCreated }) {
         reader.onload = () => resolve(reader.result);
         reader.onerror = reject;
       });
-      console.log(base65Image);
+      const userProfile = await localforage.getItem("User_Profile");
       const newPost = {
         id: Date.now().toString(),
         userId: user.id,
         authorName: user.name,
+        authorImage: userProfile?.image || null,
         image: base65Image,
         name: name,
         like: 0,
