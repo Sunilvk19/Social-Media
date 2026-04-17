@@ -10,6 +10,13 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
   const [count, setCount] = useState(4);
+  const [isFollowing, setIsFollowing] = useState({});
+
+  const handleFollowing = (id)=>{
+    setIsFollowing(prev=> ({
+      ...prev, [id]: !prev[id]
+    }));
+  }
 
   useEffect(() => {
     const fetchUsersData = async () => {
@@ -34,7 +41,7 @@ const Home = () => {
     setPosts((prev) => [newPost, ...prev]);
   };
 
-  const handleSuggestion = () => {
+  const handleSuggestion = ()=>{
     setCount(users.length);
   };
 
@@ -163,8 +170,8 @@ const Home = () => {
                           @{user.username}
                         </span>
 
-                        <Button className="w-full py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-gray-600 transition-all">
-                          Follow
+                        <Button onClick={()=> handleFollowing(user.id)} className="w-full py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-gray-600 transition-all">
+                          {isFollowing[user.id]? "Following" : "Follow"}
                         </Button>
                       </div>
                     ))}
