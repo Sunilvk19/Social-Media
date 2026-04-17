@@ -5,18 +5,29 @@ const Profile = () => {
   const [user, setUser] = useState({});
   const [image, setImage] = useState(null);
   const [posts, setPosts] = useState([]);
-
+  const [followingCount, setFollowingCount] = useState(0);
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const [userData, postData] = await Promise.all([
+        const [userData, postData, profileData] = await Promise.all([
           localforage.getItem("Current_user"),
           localforage.getItem("posts"),
+          localforage.getItem("User_Profile"),
         ]);
         if (userData) setUser(userData);
-        if (postData){
-          const myPosts = postData.filter((post) => post.userId === userData.id);
+        if (profileData?.image) setImage(profileData.image);
+        if (postData) {
+          const myPosts = postData.filter(
+            (post) => post.userId === userData.id,
+          );
           setPosts(myPosts);
+        }
+        const followingData = await localforage.getItem("Following_state");
+        if (followingData) {
+          const count = Object.values(followingData).filter(
+            (following) => following === true,
+          ).length;
+          setFollowingCount(count);
         }
       } catch (error) {
         console.log("Failed to load the data", error);
@@ -24,6 +35,26 @@ const Profile = () => {
     };
     fetchProfileData();
   }, []);
+  const handleSaveProfile = async (e) => {
+    try {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      setImage(URL.createObjectURL(file));
+
+      const base64Image = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+      setImage(base64Image);
+      await localforage.setItem("User_Profile", { image: base64Image, user });
+      console.log("Profile Picture saved Successfully !");
+    } catch (err) {
+      console.log("Failed to save the profile", err);
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-100 flex items-start py-10">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 text-center">
@@ -39,11 +70,7 @@ const Profile = () => {
             alt="user-image"
             className="w-40 h-40 rounded-full object-cover shadow-lg hover:opacity-90 transition"
           />
-          <input
-            type="file"
-            className="hidden"
-            onChange={(e) => setImage(URL.createObjectURL(e.target.files[0]))}
-          />
+          <input type="file" className="hidden" onChange={handleSaveProfile} accept="image/*" />
         </label>
 
         <div className="space-y-4 text-left">
@@ -66,13 +93,17 @@ const Profile = () => {
             </div>
             <div className="bg-indigo-50 rounded-xl py-4 flex flex-col items-center">
               <span className="text-sm text-gray-500">Following</span>
-              <h3 className="text-xl font-bold text-indigo-600">0</h3>
+              <h3 className="text-xl font-bold text-indigo-600">
+                {followingCount}
+              </h3>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="flex flex-col items-center bg-amber-500 rounded-xl py-4">
               <span className="text-sm text-gray-800">Posts</span>
-              <h3 className="text-sm text-gray-900">0</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {posts.length}
+              </h3>
             </div>
             <div className="flex flex-col items-center bg-cyan-500 rounded-xl py-4">
               <span className="text-sm text-gray-800">Likes</span>
