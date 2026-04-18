@@ -19,7 +19,7 @@
       "password": "$2b$10$SwW5rKDQcf6EbUeXDoib1uIe..M24fRY6enMqQbyXV3WqMu/DAQeS"
     }
   ],
-  "messages" : [],
+  "messages": [],
   "posts": [],
   "$schema": "./node_modules/json-server/schema.json"
 }
