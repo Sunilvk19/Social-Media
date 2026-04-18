@@ -7,6 +7,8 @@ import {
   faXmark,
   faBars,
   faMagnifyingGlass,
+  faCircle,
+  faCirclePlus,
 } from "@fortawesome/free-solid-svg-icons";
 import Input from "../common/Input";
 import Button from "../common/Button";
@@ -17,6 +19,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [notification, setNotification] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -33,7 +36,6 @@ const Navbar = () => {
   };
   const navLinks = [
     { name: "Home", path: "/home" },
-    { name: "Post", path: "/post" },
     { name: "Explore", path: "/explore" },
     { name: "Messages", path: "/messages" },
   ];
@@ -67,7 +69,7 @@ const Navbar = () => {
               );
             })}
           </ul>
-
+          <Button onClick={()=>setIsModalOpen(true)} icon={faCirclePlus}> Create Post </Button>
           <div className="flex items-center justify-end gap-3 sm:gap-5 shrink-0">
             <Input
               containerClassName="hidden lg:block w-[180px] xl:w-[220px]"
@@ -99,6 +101,7 @@ const Navbar = () => {
                 label={"profile"}
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
               />
+
               {isProfileOpen && (
                 <div className="absolute right-0 z-10 mt-2 flex flex-col w-48 py-1 bg-white rounded-lg shadow-lg border border-gray-100 cursor-pointer">
                   <Link
@@ -169,6 +172,7 @@ const Navbar = () => {
             </ul>
           </div>
         )}
+
       </nav>
       <div className="h-[73px]"></div>
     </>

@@ -8,6 +8,7 @@ function Post({ onPostCreated }) {
   const [form, setForm] = useState(false);
   const [name, setName] = useState("");
   const [user, setUser] = useState(null);
+  const [isSubmiting, setIsSubmiting] = useState(false);
 
   useEffect(() => {
     localforage.getItem("Current_user").then((user) => {
@@ -18,6 +19,9 @@ function Post({ onPostCreated }) {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if(image?.url){
+        URL.revokeObjectURL(image.url);
+      }
       const currentImageUrl = URL.createObjectURL(file);
       setImage({
         file: file,
@@ -37,15 +41,23 @@ function Post({ onPostCreated }) {
       RemoveImage();
       setName("");
     }
+    setIsSubmiting(false);
     setForm((prev) => !prev);
   };
 
   const handleSubmit = async () => {
-    if (!image?.file) return;
-    if (!user) return;
+    if (!image?.file) {
+      alert("Please Upload an Image");
+      return;
+    }
+    if (!user) {
+      alert("Please Login to Create Post");
+      return;
+    }
 
     try {
-      const base65Image = await new Promise((resolve, reject) => {
+      setIsSubmiting(true);
+      const base64Image = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(image.file);
         reader.onload = () => resolve(reader.result);
@@ -57,7 +69,7 @@ function Post({ onPostCreated }) {
         userId: user.id,
         authorName: user.name,
         authorImage: userProfile?.image || null,
-        image: base65Image,
+        image: base64Image,
         name: name,
         like: 0,
         comments: [],
@@ -72,14 +84,16 @@ function Post({ onPostCreated }) {
       RemoveImage();
       setName("");
       setForm(false);
+      setIsSubmiting(false);
     } catch (error) {
       console.error("Failed to create Post", error);
       alert("Failed to create post");
+      setIsSubmiting(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 overflow-hidden">
+    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 overflow-hidden">
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-xl font-extrabold text-gray-800 tracking-tight">
           New Post
@@ -111,7 +125,7 @@ function Post({ onPostCreated }) {
                 </Button>
               </div>
             ) : (
-              <div className="py-8">
+              <div className="py-4">
                 <label className="text-sm font-semibold text-blue-600 cursor-pointer hover:underline">
                   Click to upload an image
                   <Input
@@ -139,8 +153,8 @@ function Post({ onPostCreated }) {
             />
           </div>
 
-          <Button onClick={handleSubmit} className="w-full">
-            Publish Post
+          <Button onClick={handleSubmit} disabled={!image || isSubmiting} className="w-full">
+            {isSubmiting ? "Publishing...":"Publish Post"}
           </Button>
         </div>
       ) : (

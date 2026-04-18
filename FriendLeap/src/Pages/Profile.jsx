@@ -1,5 +1,7 @@
+import { icon } from "@fortawesome/fontawesome-svg-core";
 import localforage from "localforage";
 import React, { useEffect, useState } from "react";
+import Button from "../components/common/Button";
 
 const Profile = () => {
   const [user, setUser] = useState({});
@@ -55,6 +57,17 @@ const Profile = () => {
       console.log("Failed to save the profile", err);
     }
   };
+  const handleDelete = async (id) => {
+    try {
+      const existingPosts = (await localforage.getItem("posts")) || [];
+      const updatedPosts = existingPosts.filter((post) => post.id !== id);
+      await localforage.setItem("posts", updatedPosts);
+      // Update local state to immediately remove the deleted post
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+    } catch(error) {
+      console.error("Failed to delete post", error);
+    }
+  }
   return (
     <div className="min-h-screen bg-gray-100 flex items-start py-10">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 text-center">
@@ -119,12 +132,20 @@ const Profile = () => {
         <div className="grid grid-cols-2 gap-4">
           {posts.map((post) => {
             return (
-              <div key={post.id}>
+              <div key={post.id} className="relative group overflow-hidden rounded-lg shadow-sm">
                 <img
                   src={post.image}
                   alt=""
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                  style={{ aspectRatio: '1/1' }}
                 />
+                <Button 
+                  onClick={() => handleDelete(post.id)} 
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-500 text-white hover:bg-red-600 transition-all duration-300 cursor-pointer text-xs py-1 px-3"
+                  size="sm"
+                >
+                  Delete
+                </Button>
               </div>
             );
           })}
