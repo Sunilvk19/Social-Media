@@ -14,7 +14,7 @@ function Post({ onPostCreated }) {
       setUser(user);
     });
   }, []);
-  
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -33,7 +33,7 @@ function Post({ onPostCreated }) {
   };
 
   const handleForm = () => {
-    if(form){
+    if (form) {
       RemoveImage();
       setName("");
     }
