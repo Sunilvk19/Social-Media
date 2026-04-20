@@ -7,7 +7,6 @@ import {
   faXmark,
   faBars,
   faMagnifyingGlass,
-  faCircle,
   faCirclePlus,
 } from "@fortawesome/free-solid-svg-icons";
 import Input from "../common/Input";
