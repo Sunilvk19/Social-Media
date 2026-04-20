@@ -39,6 +39,7 @@ const Explore = () => {
     };
     fetchUsers();
   }, []);
+  
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <span className="text-2xl font-bold text-gray-800">Explore</span>
