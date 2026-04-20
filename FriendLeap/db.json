@@ -19,21 +19,6 @@
       "password": "$2b$10$SwW5rKDQcf6EbUeXDoib1uIe..M24fRY6enMqQbyXV3WqMu/DAQeS"
     }
   ],
-  "messages": [
-    {
-      "text": "hi",
-      "senderId": "1d1BrPMcrWQ",
-      "receiverId": "group",
-      "timestamp": "2026-04-18T16:34:50.350Z",
-      "id": "cz4YEwWe_Nc"
-    },
-    {
-      "text": "hello",
-      "senderId": "1d1BrPMcrWQ",
-      "receiverId": "group",
-      "timestamp": "2026-04-18T17:13:34.012Z",
-      "id": "IorwvGyDpUU"
-    }
-  ],
+  "messages": [],
   "$schema": "./node_modules/json-server/schema.json"
 }
