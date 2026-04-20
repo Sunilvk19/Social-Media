@@ -1,170 +1,116 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Input from "../components/common/Input";
-import Button from "../components/common/Button";
 import { handleLogin, handleRegister } from "../services/Auth";
 import localforage from "localforage";
-import { faEnvelope, faEye, faEyeSlash, faUser } from "@fortawesome/free-solid-svg-icons";
+import Input from "../components/common/Input";
+import Button from "../components/common/Button";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
-
   const [error, setError] = useState("");
+
   const navigate = useNavigate();
 
-  const handleRegisterUser = async () => {
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password) {
-      setError("Please fill all the fields");
-      return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      return;
-    }
-    try {
-      await handleRegister({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      });
-      setError("");
-      setFormData({ name: "", email: "", password: "" });
-      setIsLogin(true);
-      alert("User registered successfully");
-    } catch (err) {
-      setError("Failed to register. Please try again");
-    }
-  };
-
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  
-  const handleLoginUser = async () => {
-    if (!formData.email.trim() || !formData.password) {
-      setError("Please enter your email and password");
-      return;
-    }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
     try {
-      const user = await handleLogin(formData.email, formData.password);
-      await localforage.setItem("Current_user", user);
-      setError("");
-      setFormData({ name: "", email: "", password: "" });
-      navigate("/home");
+      if (isLogin) {
+        const user = await handleLogin(formData.email, formData.password);
+        await localforage.setItem("Current_user", user);
+        navigate("/home");
+      } else {
+        await handleRegister(formData);
+        setIsLogin(true);
+      }
     } catch (err) {
-      setError(
-        err.message || "An error occurred trying to connect to the database.",
-      );
+      setError("Something went wrong");
     }
   };
-  const handleTogglePassword = () => {
-    setShowPassword(!showPassword);
-  }
+
   return (
-    <div>
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-          <h2 className="text-3xl font-bold w-full text-center mb-8 text-gray-800">
-            {isLogin ? "Welcome Back" : "Create Account"}
+    <div className="min-h-screen flex bg-black text-white">
+
+      <div className="hidden md:flex w-1/2 flex-col justify-center items-center bg-linear-to-br from-purple-600 to-pink-500 p-10">
+        <h1 className="text-5xl font-bold mb-4">FriendLeap</h1>
+        <p className="text-lg opacity-80 text-center max-w-md">
+          Connect. Share. Grow.  
+          Build your network like never before.
+        </p>
+      </div>
+
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6 bg-black">
+        <div className="w-full max-w-md">
+
+          <h2 className="text-3xl font-bold mb-6">
+            {isLogin ? "Sign In" : "Create Account"}
           </h2>
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              isLogin ? handleLoginUser() : handleRegisterUser();
-            }}
-          >
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+
             {!isLogin && (
-              <div>
-                <label
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                  htmlFor="name"
-                >
-                  Name
-                </label>
+              <>
+               <Input
+                  type="text"
+                  name="firstName"
+                  placeholder="First Name"
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-purple-500 text-black" />
                 <Input
                   type="text"
-                  id="name"
-                  name="name"
-                  placeholder={"Enter your name"}
-                  value={formData.name}
+                  name="lastName"
+                  placeholder="Last Name"
                   onChange={handleChange}
-                  icon={faUser}
-                />
-              </div>
+                  className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-purple-500 text-black" />
+              </>
+
             )}
 
-            <div>
-              <label
-                className="block text-sm font-medium text-gray-700 mb-1"
-                htmlFor="email"
-              >
-                Email
-              </label>
-              <Input
-                type="email"
-                id="email"
-                name="email"
-                placeholder={"Enter your email"}
-                value={formData.email}
-                onChange={handleChange}
-                icon={faEnvelope}
-              />
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium text-gray-700 mb-1"
-                htmlFor="password"
-              >
-                Password
-              </label>
-              <Input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                placeholder={"Enter your password"}
-                value={formData.password}
-                onChange={handleChange}
-                icon={showPassword ? faEye : faEyeSlash}
-                onIconClick={handleTogglePassword}
-              />
-            </div>
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            <Input
+              type="email"
+              name="email"
+              placeholder="Email"
+              onChange={handleChange}
+              className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-purple-500 text-black"
+            />
+
+            <Input
+              type="password"
+              name="password"
+              placeholder="Password"
+              onChange={handleChange}
+              className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-purple-500 text-black"
+            />
+
+            {error && <p className="text-red-400 text-sm">{error}</p>}
+
             <Button
               type="submit"
-              label={isLogin ? "Sign In" : "Register"}
-              className="w-full py-3 mt-4"
-            />
-            <div className="mt-6 text-center text-sm text-gray-600">
-              {isLogin
-                ? "Don't have an account? "
-                : "Already have an account? "}
-              <Button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setError("");
-                  setFormData({ name: "", email: "", password: "" });
-                }}
-                className="text-gray-800 hover:text-red-500 font-semibold"
-              >
-                {isLogin ? "Sign Up" : "Sign In"}
-              </Button>
-            </div>
+              className="w-full py-3 bg-linear-to-r from-cyan-500 to-blue-500 rounded-lg font-semibold hover:scale-105 transition"
+            >
+              {isLogin ? "Login" : "Sign Up"}
+            </Button>
           </form>
+
+          <p className="mt-6 text-sm text-gray-400">
+            {isLogin ? "Don't have an account?" : "Already have an account?"}
+            <span
+              onClick={() => setIsLogin(!isLogin)}
+              className="ml-2 text-white cursor-pointer"
+            >
+              {isLogin ? "Sign Up" : "Sign In"}
+            </span>
+          </p>
         </div>
       </div>
     </div>

@@ -99,4 +99,5 @@ export const handleLogin = async (email, password) => {
 
 export const handleLogout = async () => {
    await localforage.removeItem("user");
+   await localforage.removeItem("Current_user");
 }
