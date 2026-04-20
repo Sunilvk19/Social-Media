@@ -48,7 +48,7 @@ const Navbar = () => {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0"
           >
             <img src={image} alt="logo" className="w-12 h-12 rounded-2xl" />
-            <span className="text-xl font-extrabold bg-clip-text text-transparent bg-orange-500 tracking-tight hidden sm:block">
+            <span className="text-2xl font-black bg-clip-text text-transparent bg-linear-to-r from-cyan-500 via-blue-500 to-purple-500 tracking-tighter hidden sm:block drop-shadow-sm">
               FriendLeap
             </span>
           </Link>

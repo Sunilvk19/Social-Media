@@ -20,8 +20,8 @@ function Post({ onPostCreated }) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const currentUser = await localforage.getItem("Current_user");
-      const userProfile = await localforage.getItem("User_Profile");
+      const currentUser = await localforage.getItem(`Current_user`);
+      const userProfile = await localforage.getItem(`User_Profile_${currentUser.id}`);
       if (currentUser) {
         setUser({ ...currentUser, image: userProfile?.image || null });
       }
@@ -99,12 +99,10 @@ function Post({ onPostCreated }) {
       if (onPostCreated) {
         onPostCreated(newPost);
       } else {
-        const existingPosts = (await localforage.getItem("posts")) || [];
+        const existingPosts = (await localforage.getItem(`posts_${user.id}`)) || [];
         const updatedPosts = [newPost, ...existingPosts];
-        await localforage.setItem("posts", updatedPosts);
+        await localforage.setItem(`posts_${user.id}`, updatedPosts);
       }
-
-      // Reset form
       removeImage();
       setName("");
       setIsExpanded(false);
@@ -123,13 +121,13 @@ function Post({ onPostCreated }) {
           <div className="w-12 h-12 rounded-full border-2 border-gray-50 bg-gray-100 overflow-hidden shadow-sm">
             {user?.image ? (
               <img
-                src={user.image}
+                src={`${user.image}`}
                 alt="User"
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-lg font-bold text-indigo-500 bg-amber-100">
-                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+              <div className="w-full h-full flex items-center justify-center text-lg font-bold text-indigo-500 bg-amber-100 hover:cursor-pointer">
+                {user?.firstName ? user.firstName.charAt(0).toUpperCase() : "U"}
               </div>
             )}
           </div>
