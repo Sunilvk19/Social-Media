@@ -63,7 +63,6 @@ const Login = () => {
       await localforage.setItem("Current_user", user);
       setError("");
       setFormData({ name: "", email: "", password: "" });
-      alert(`Welcome back, ${user.name}! You are logged in.`);
       navigate("/home");
     } catch (err) {
       setError(
