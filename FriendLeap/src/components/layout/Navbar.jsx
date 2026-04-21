@@ -38,7 +38,9 @@ const Navbar = () => {
     { name: "Explore", path: "/explore" },
     { name: "Messages", path: "/messages" },
   ];
-
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  }
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
@@ -73,6 +75,7 @@ const Navbar = () => {
             <Input
               containerClassName="hidden lg:block w-[180px] xl:w-[220px]"
               icon={faMagnifyingGlass}
+              onChange={handleSearchChange}
               type="text"
               placeholder="Search..."
               className="pl-10 pr-4 py-2 w-full bg-gray-50 border border-gray-200 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all shadow-inner"

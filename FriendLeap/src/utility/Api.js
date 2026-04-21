@@ -12,5 +12,6 @@ export const END_POINTS = {
     REGISTER: "/register",
     GET_USER: "/users",
     POST_USER: "/users",
-    GET_POSTS: "/posts"
+    GET_POSTS: "/posts",
+    SEARCH_USER: "/users/search"
 }

@@ -57,13 +57,14 @@ const Home = () => {
       try {
         const userData = await localforage.getItem("Current_user");
         if (!userData) return;
-        const [mockData, postsData, followingData, userProfile, likedData] =
+        const [mockData, postsData, followingData, userProfile, likedData,getMockPosts] =
           await Promise.all([
             getMockUsers(),
             localforage.getItem(`posts_${userData.id}`),
             localforage.getItem(`Following_state_${userData.id}`),
             localforage.getItem(`User_Profile_${userData.id}`),
             localforage.getItem(`liked_posts_${userData.id}`),
+            localforage.getItem(`posts_${userData.id}`),
           ]);
         if (userData) {
           setcurrentUser({
@@ -75,6 +76,7 @@ const Home = () => {
         if (postsData) setPosts(postsData);
         if (followingData) setIsFollowing(followingData);
         if (likedData) setLikedPosts(new Set(likedData));
+        if (getMockPosts?.posts) setPosts(getMockPosts.posts);
       } catch (error) {
         console.log("Error fetching data", error);
       } finally {
@@ -88,6 +90,7 @@ const Home = () => {
     setPosts((prev) => {
       const updated = [newPost, ...prev];
       localforage.setItem(`posts_${currentUser.id}`, updated);
+      localforage.setItem(`posts_${userData.id}`, updated);
       return updated;
     });
   };
@@ -125,8 +128,8 @@ const Home = () => {
                           />
                         ) : (
                           <div className="w-full h-full bg-amber-200 flex items-center justify-center text-4xl font-extrabold text-indigo-500 shadow-inner">
-                            {currentUser?.name
-                              ? currentUser.name.charAt(0).toUpperCase()
+                            {currentUser?.firstName
+                              ? currentUser.firstName.charAt(0).toUpperCase()
                               : "U"}
                           </div>
                         )}
@@ -134,7 +137,7 @@ const Home = () => {
                     </div>
                     <div className="text-center mb-4">
                       <h2 className="text-xl font-bold text-gray-800 tracking-tight">
-                        {currentUser?.name || "User"}
+                        {currentUser?.firstName + " " + currentUser?.lastName || "User"}
                       </h2>
                       <p className="text-gray-500 text-sm">
                         {currentUser?.email || "Email"}
@@ -180,7 +183,7 @@ const Home = () => {
               <div className="flex-1 max-w-2xl w-full flex flex-col space-y-6">
                 <div className="bg-white ">
                   <Post onPostCreated={handleNewPost} />
-                  {posts.map((post) => {
+                  {posts?.map((post) => {
                     return (
                       <div
                         key={post.id}
