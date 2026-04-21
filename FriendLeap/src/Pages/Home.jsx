@@ -1,213 +1,264 @@
 import React, { useEffect, useState } from "react";
 import { getMockUsers } from "../services/Mock";
+import { getRealUsers } from "../services/User";
 import Button from "../components/common/Button";
 import Post from "./Post";
 import localforage from "localforage";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faComment, faHeart } from "@fortawesome/free-solid-svg-icons";
 
 const Home = () => {
-  const [currentUser, setcurrentUser] = useState({});
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [posts, setPosts] = useState([]);
-  const [count, setCount] = useState(4);
-  const [isFollowing, setIsFollowing] = useState({});
+  const [currentUser, setcurrentUser] = useState({});
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
+  const [count, setCount] = useState(4);
+  const [isFollowing, setIsFollowing] = useState({});
+  
 
-  const handleFollowing = (id) => {
-    setIsFollowing((prev) => {
-      const updatedState = { ...prev, [id]: !prev[id] };
-      localforage.setItem("Following_state", updatedState);
-      return updatedState;
-    });
-  };
+  const handleFollowing = (id) => {
+    setIsFollowing((prev) => {
+      const updatedState = { ...prev, [id]: !prev[id] };
+      localforage.setItem("Following_state", updatedState);
+      return updatedState;
+    });
+  };
 
-  useEffect(() => {
-    const fetchUsersData = async () => {
-      try {
-        const [userData, mockData, postsData, followingData, userProfile] =
-          await Promise.all([
-            localforage.getItem("Current_user"),
-            getMockUsers(),
-            localforage.getItem("posts"),
-            localforage.getItem("Following_state"),
-            localforage.getItem("User_Profile"),
-          ]);
-        if (userData) {
-          setcurrentUser({
-            ...userData,
-            image: userProfile?.image || null,
-          });
-        }
-        if (mockData?.users) setUsers(mockData.users);
-        if (postsData) setPosts(postsData);
-        if (followingData) setIsFollowing(followingData);
-      } catch (error) {
-        console.log("Error fetching data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsersData();
-  }, []);
-  const handleNewPost = (newPost) => {
-    setPosts((prev) => [newPost, ...prev]);
-  };
+  useEffect(() => {
+    const fetchUsersData = async () => {
+      try {
+        const [userData, mockData, realData, postsData, followingData, userProfile] =
+          await Promise.all([
+            localforage.getItem("Current_user"),
+            getMockUsers(),
+            getRealUsers(),
+            localforage.getItem("posts"),
+            localforage.getItem("Following_state"),
+            localforage.getItem("User_Profile"),
+          ]);
 
-  const handleSuggestion = () => {
-    setCount(users.length);
-  };
+        if (userData) {
+          setcurrentUser({
+            ...userData,
+            image: userProfile?.image || null,
+          });
+        }
+        
+        const mockUsers = (mockData?.users || []).map((user) => ({
+          name: `${user.firstName} ${user.lastName}`,
+          id: user.id,
+          image: user.image,
+        }));
 
-  return (
-    <>
-      {!loading && (
-        <div className="min-h-screen bg-gray-50 pt-8 pb-5 font-sans">
-          <div className="max-w-7/12xl mx-auto px-6 sm:px-6 lg:px-8">
-            <div className="flex flex-col lg:flex-row gap-8">
-              <div className="hidden lg:block w-80 shrink-0 space-y-6 animate-in slide-in-from-left-8 duration-700">
-                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden relative group hover:shadow-md transition-all">
-                  <div className="h-28 bg-cyan-500 w-full group-hover:scale-105 transition-transform duration-700"></div>
-                  <div className="px-6 pb-6 relative">
-                    <div className="flex justify-center -mt-12 mb-4">
-                      <div className="w-22 h-22 rounded-full border-4 border-white bg-white overflow-hidden shadow-md">
-                        {currentUser?.image ? (
-                          <img
-                            src={currentUser.image}
-                            alt="User_Profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-amber-200 flex items-center justify-center text-4xl font-extrabold text-indigo-500 shadow-inner">
-                            {currentUser?.name
-                              ? currentUser.name.charAt(0).toUpperCase()
-                              : "U"}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-center mb-4">
-                      <h2 className="text-xl font-bold text-gray-800 tracking-tight">
-                        {currentUser?.name || "User"}
-                      </h2>
-                      <p className="text-gray-500 text-sm">
-                        {currentUser?.email || "Email"}
-                      </p>
-                    </div>
-                    <div className="flex justify-between text-center pt-2">
-                      <div className="group/stat cursor-pointer">
-                        <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
-                          {posts.filter(post => post.userId === currentUser?.id).length}
-                        </p>
-                        <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
-                          Posts
-                        </p>
-                      </div>
-                      <div className="group/stat cursor-pointer">
-                        <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
-                          {Object.values(isFollowing).filter(value => value === true).length}
-                        </p>
-                        <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
-                          Followers
-                        </p>
-                      </div>
-                      <div className="group/stat cursor-pointer">
-                        <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
-                          {currentUser?.following || 0}
-                        </p>
-                        <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
-                          Following
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex-1 flex flex-col space-y-6">
-                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-5 flex gap-4 overflow-x-auto hide-scrollbar snap-x">
-                  <div className="flex flex-col items-center gap-2 cursor-pointer shrink-0 snap-start">
-                    <div className="w-16 h-16 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-500 transition-all text-gray-400 group">
-                      <span className="text-2xl group-hover:scale-110 transition-transform">
-                        +
-                      </span>
-                    </div>
-                    <span className="text-xs font-semibold text-gray-600">
-                      Add Story
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <Post onPostCreated={handleNewPost} />
-                  {posts.map((post) => {
-                    return (
-                      <div
-                        key={post.id}
-                        className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 overflow-hidden mt-6"
-                      >
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold uppercase shadow-sm">
-                            {post.authorName ? post.authorName.charAt(0) : "U"}
-                          </div>
-                          <h3 className="font-bold text-gray-800">
-                            {post.authorName || "User"}
-                          </h3>
-                        </div>
-                        {post.image && (
-                          <img
-                            src={post.image}
-                            alt="post"
-                            className="w-full h-auto rounded-xl object-cover mb-4"
-                          />
-                        )}
-                        <p className="text-gray-800 font-medium">{post.name}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
-                  <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-xl font-bold text-gray-800">
-                      Suggestions For You
-                    </h2>
-                    <Button onClick={handleSuggestion}> See all</Button>
-                  </div>
+        const realUsers = (realData || []).map((user) => ({
+          id: user.id,
+          name: user.name,
+        }));
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-5">
-                    {users.slice(0, count).map((user) => (
-                      <div
-                        key={user.id}
-                        className="bg-gray-50 rounded-2xl p-4 text-center hover:shadow-md transition-all duration-300 group"
-                      >
-                        <div className="relative w-20 h-20 mx-auto mb-3">
-                          <img
-                            src={user.image}
-                            alt="User"
-                            className="w-full h-full rounded-full object-cover border-4 border-white shadow-sm group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
+        const combinedUsers = [...realUsers, ...mockUsers];
+        setUsers(combinedUsers);
 
-                        <span className="text-sm font-semibold text-gray-800 truncate">
-                          {user.firstName} {user.lastName}
-                        </span>
+        if (postsData) setPosts(postsData);
+        if (followingData) setIsFollowing(followingData);
+      } catch (error) {
+        console.log("Error fetching data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsersData();
+  }, []);
 
-                        <span className="text-xs text-gray-500 mb-3">
-                          @{user.username}
-                        </span>
+  const handleNewPost = (newPost) => {
+    setPosts((prev) => {
+      const updated = [newPost, ...prev];
+      localforage.setItem("posts", updated);
+      return updated;
+    });
+  };
 
-                        <Button
-                          onClick={() => handleFollowing(user.id)}
-                          className="w-full py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-gray-600 transition-all"
-                        >
-                          {isFollowing[user.id] ? "Following" : "Follow"}
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
+  const filteredUsers = users.filter(
+    (user) => !isFollowing[user.id] && user.id !== currentUser.id,
+  );
+
+  const handleSuggestion = () => {
+    setCount(filteredUsers.length);
+  };
+
+  return (
+    <>
+      {!loading && (
+        <div className="min-h-screen bg-gray-50 pt-8 pb-5 font-sans">
+          <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
+            <div className="flex flex-col lg:flex-row gap-8">
+              <div className="hidden lg:block w-80 shrink-0 space-y-6 animate-in slide-in-from-left-8 duration-700">
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden relative group hover:shadow-md transition-all">
+                  <div className="h-28 bg-cyan-500 w-full group-hover:scale-105 transition-transform duration-700"></div>
+                  <div className="px-6 pb-6 relative">
+                    <div className="flex justify-center -mt-12 mb-4">
+                      <div className="w-24 h-24 rounded-full border-4 border-white bg-white overflow-hidden shadow-md">
+                        {currentUser?.image ? (
+                          <img
+                            src={currentUser.image}
+                            alt="User_Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-amber-200 flex items-center justify-center text-4xl font-extrabold text-indigo-500 shadow-inner">
+                            {currentUser?.name
+                              ? currentUser.name.charAt(0).toUpperCase()
+                              : "U"}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-center mb-4">
+                      <h2 className="text-xl font-bold text-gray-800 tracking-tight">
+                        {currentUser?.name || "User"}
+                      </h2>
+                      <p className="text-gray-500 text-sm">
+                        {currentUser?.email || "Email"}
+                      </p>
+                    </div>
+                    <div className="flex justify-between text-center pt-2">
+                      <div className="group/stat cursor-pointer">
+                        <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
+                          {
+                            posts.filter(
+                              (post) => post.userId === currentUser?.id,
+                            ).length
+                          }
+                        </p>
+                        <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
+                          Posts
+                        </p>
+                      </div>
+                      <div className="group/stat cursor-pointer">
+                        <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
+                          {
+                            Object.values(isFollowing).filter(
+                              (value) => value === true,
+                            ).length
+                          }
+                        </p>
+                        <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
+                          Following
+                        </p>
+                      </div>
+                      <div className="group/stat cursor-pointer">
+                        <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
+                          {currentUser?.followers || 0}
+                        </p>
+                        <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
+                          Followers
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1 max-w-2xl w-full flex flex-col space-y-6">
+                <div className="bg-white ">
+                  <Post onPostCreated={handleNewPost} />
+                  {posts.map((post) => {
+                    return (
+                      <div
+                        key={post.id}
+                        className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 overflow-hidden mt-6"
+                      >
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold uppercase shadow-sm">
+                            {post.authorName ? post.authorName.charAt(0) : "U"}
+                          </div>
+                          <h3 className="font-bold text-gray-800">
+                            {post.authorName || "User"}
+                          </h3>
+                        </div>
+                        {post.image && post.image.startsWith("data:video/") ? (
+                          <video
+                            src={post.image}
+                            controls
+                            className="w-full max-h-96 rounded-xl object-cover mb-4 bg-black"
+                          />
+                        ) : post.image ? (
+                          <img
+                            src={post.image}
+                            alt="post"
+                            className="w-full h-auto rounded-xl object-cover mb-4"
+                          />
+                        ) : null}
+                        <p className="text-gray-800 font-medium">{post.name}</p>
+                        <div className="flex items-center gap-2">
+                          <Button className="flex items-center gap-2 bg-white hover:bg-gray-300 text-gray-800 border border-gray-100"><FontAwesomeIcon icon={faHeart} />Like</Button>
+                          <Button className="flex items-center gap-2 bg-white hover:bg-gray-300 text-gray-800 border border-gray-100"><FontAwesomeIcon icon={faComment} />Comments</Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="hidden xl:block w-80 shrink-0 space-y-6 sticky top-24 h-max animate-in slide-in-from-right-8 duration-700">
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-5">
+                  <div className="flex items-center justify-between mb-5">
+                    <h2 className="text-[16px] font-bold text-gray-800">
+                      Who to follow
+                    </h2>
+                    <Button onClick={handleSuggestion} className="bg-transparent text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:bg-transparent shadow-none px-0"> 
+                      See all
+                    </Button>
+                  </div>
+
+                  <div className="flex flex-col gap-4">
+                    {users
+                      .filter(
+                        (user) =>
+                          !isFollowing[user.id] && user.id !== currentUser?.id,
+                      )
+                      .slice(0, count)
+                      .map((user) => (
+                        <div
+                          key={user.id}
+                          className="flex items-center justify-between group"
+                        >
+                          <div className="flex items-center gap-3 w-full min-w-0 pr-2">
+                            <div className="relative w-11 h-11 shrink-0">
+                              <img
+                                src={user.image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+                                alt="User"
+                                className="w-full h-full rounded-full object-cover border border-gray-100 shadow-sm transition-transform duration-300 group-hover:scale-105"
+                              />
+                            </div>
+                            <div className="flex flex-col truncate">
+                              <span className="text-[14px] font-bold text-gray-800 truncate hover:text-indigo-600 transition-colors cursor-pointer">
+                                {user.name}
+                              </span>
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={() => handleFollowing(user.id)}
+                            className="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border-2 border-slate-100 text-slate-700 hover:bg-slate-50 hover:border-slate-200 transition-all shadow-sm"
+                          >
+                            {isFollowing[user.id] ? "Following" : "Follow"}
+                          </Button>
+                        </div>
+                      ))}
+                    {filteredUsers.length === 0 && (
+                      <div className="text-center bg-gray-50 p-6 rounded-2xl border border-gray-100 w-full">
+                        <p className="text-[13px] font-bold text-gray-600">
+                          No suggestions
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
 export default Home;
