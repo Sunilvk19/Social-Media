@@ -31,15 +31,15 @@ const Explore = () => {
     };
     fetchData();
   }, []);
-  const query = searchQuery.trim().toLocaleLowerCase();
+  const query = searchQuery.trim().toLowerCase();
   const filteredUsers = query? users.filter((user)=>{
-    const fullName = `${user.username}`.toLocaleLowerCase();
+    const fullName = `${user.username}`.toLowerCase();
     return fullName.includes(query);
   }): users;
 
   const filteredPosts = query? posts.filter((post)=>{
-    const title = post.title.toLocaleLowerCase();
-    const body = post.body.toLocaleLowerCase();
+    const title = post.title.toLowerCase();
+    const body = post.body.toLowerCase();
     return title.includes(query) || body.includes(query);
   }): posts;
 
@@ -93,6 +93,9 @@ const Explore = () => {
                     </span>
                     <span className="text-xs font-semibold text-gray-500">
                       @{user.username}
+                    </span>
+                    <span>
+                      {user.followers} 
                     </span>
                   </div>
                 </div>

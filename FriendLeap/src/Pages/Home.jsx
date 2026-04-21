@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getMockUsers } from "../services/Mock";
+import { getMockUsers, getMockPosts } from "../services/Mock";
 import Button from "../components/common/Button";
 import Post from "./Post";
 import localforage from "localforage";
@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
-  const [currentUser, setcurrentUser] = useState({});
+  const [currentUser, setCurrentUser] = useState({});
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
@@ -57,26 +57,38 @@ const Home = () => {
       try {
         const userData = await localforage.getItem("Current_user");
         if (!userData) return;
-        const [mockData, postsData, followingData, userProfile, likedData,getMockPosts] =
+        setCurrentUser(userData);
+        const usersRes = await getMockUsers();
+        if(usersRes?.users){
+          setUsers(usersRes.users);
+        }
+        const localPosts = await localforage.getItem(`posts_${userData.id}`);
+        if(localPosts){
+          setPosts(localPosts);
+        }else{
+          const postsRes = await getMockPosts();
+          if(postsRes?.posts){
+            setPosts(postsRes.posts);
+            await localforage.setItem(
+              `posts_${userData.id}`,
+              postsRes.posts
+            )
+          }
+        }
+        const [ followingData, userProfile, likedData] =
           await Promise.all([
-            getMockUsers(),
-            localforage.getItem(`posts_${userData.id}`),
             localforage.getItem(`Following_state_${userData.id}`),
             localforage.getItem(`User_Profile_${userData.id}`),
             localforage.getItem(`liked_posts_${userData.id}`),
-            localforage.getItem(`posts_${userData.id}`),
           ]);
-        if (userData) {
-          setcurrentUser({
-            ...userData,
-            image: userProfile?.image || null,
-          });
+        if (userProfile?.image){
+          setCurrentUser((prev) => ({
+            ...prev,
+            image: userProfile.image,
+          }));
         }
-        if (mockData?.users) setUsers(mockData.users);
-        if (postsData) setPosts(postsData);
         if (followingData) setIsFollowing(followingData);
         if (likedData) setLikedPosts(new Set(likedData));
-        if (getMockPosts?.posts) setPosts(getMockPosts.posts);
       } catch (error) {
         console.log("Error fetching data", error);
       } finally {
@@ -90,7 +102,6 @@ const Home = () => {
     setPosts((prev) => {
       const updated = [newPost, ...prev];
       localforage.setItem(`posts_${currentUser.id}`, updated);
-      localforage.setItem(`posts_${userData.id}`, updated);
       return updated;
     });
   };
@@ -170,7 +181,7 @@ const Home = () => {
                       </div>
                       <div className="group/stat cursor-pointer">
                         <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
-                          {currentUser?.followers?.length || 0}
+                          {currentUser?.followers?.length || 0} 
                         </p>
                         <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
                           Followers
@@ -190,8 +201,18 @@ const Home = () => {
                         className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 overflow-hidden mt-6"
                       >
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold uppercase shadow-sm">
-                            {post.authorName ? post.authorName.charAt(0) : "U"}
+                          <div className="w-10 h-10 rounded-full border-2 border-gray-50 bg-gray-100 overflow-hidden shadow-sm">
+                            {post?.authorImage ? (
+                              <img
+                                src={`${post.authorImage}`}
+                                alt="User"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-lg font-bold text-indigo-500 bg-amber-100 hover:cursor-pointer">
+                                {post?.authorName ? post.authorName.charAt(0).toUpperCase() : "U"}
+                              </div>
+                            )}
                           </div>
                           <h3 className="font-bold text-gray-800">
                             {post.authorName || "User"}

@@ -8,6 +8,7 @@ const Layout = ({children}) => {
       <main className='pt-2'>{children}</main>
       {/* <Outlet /> */}
     </div>
+    
   )
 }
 
