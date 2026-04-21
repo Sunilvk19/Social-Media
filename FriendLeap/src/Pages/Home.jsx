@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getMockUsers } from "../services/Mock";
+import { getRealUsers } from "../services/User";
 import Button from "../components/common/Button";
 import Post from "./Post";
 import localforage from "localforage";
