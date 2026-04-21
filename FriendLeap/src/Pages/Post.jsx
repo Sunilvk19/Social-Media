@@ -213,7 +213,7 @@ function Post({ onPostCreated }) {
                     removeImage();
                     setName("");
                   }}
-                  className="text-gray-500 hover:bg-gray-100 rounded-full"
+                  className="text-gray-500 hover:bg-gray-100 rounded-full cursor-pointer"
                 >
                   Cancel
                 </Button>

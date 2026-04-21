@@ -18,7 +18,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [notification, setNotification] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -70,8 +70,8 @@ const Navbar = () => {
               );
             })}
           </ul>
-          <Button onClick={()=>setIsModalOpen(true)} icon={faCirclePlus}> Create Post </Button>
-          <div className="flex items-center justify-end gap-3 sm:gap-5 shrink-0">
+          <Button onClick={()=>setIsModalOpen(true)} icon={faCirclePlus} />
+          <div className="flex items-center justify-end gap-2 sm:gap-3 shrink-0">
             <Input
               containerClassName="hidden lg:block w-[180px] xl:w-[220px]"
               icon={faMagnifyingGlass}

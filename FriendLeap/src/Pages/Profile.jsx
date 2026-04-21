@@ -52,7 +52,10 @@ const Profile = () => {
         reader.onerror = (error) => reject(error);
       });
       setImage(base64Image);
-      await localforage.setItem(`User_Profile_${user.id}`, { image: base64Image, user });
+      await localforage.setItem(`User_Profile_${user.id}`, {
+        image: base64Image,
+        user,
+      });
       console.log("Profile Picture saved Successfully !");
     } catch (err) {
       console.log("Failed to save the profile", err);
@@ -64,10 +67,10 @@ const Profile = () => {
       const updatedPosts = existingPosts.filter((post) => post.id !== id);
       await localforage.setItem("posts", updatedPosts);
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
-    } catch(error) {
+    } catch (error) {
       console.error("Failed to delete post", error);
     }
-  }
+  };
   return (
     <div className="min-h-screen bg-gray-100 flex items-start py-10 gap-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 text-center">
@@ -83,13 +86,20 @@ const Profile = () => {
             alt="user-image"
             className="w-40 h-40 rounded-full object-cover shadow-lg hover:opacity-90 transition"
           />
-          <input type="file" className="hidden" onChange={handleSaveProfile} accept="image/*" />
+          <input
+            type="file"
+            className="hidden"
+            onChange={handleSaveProfile}
+            accept="image/*"
+          />
         </label>
 
         <div className="space-y-4 text-left">
           <div className="bg-gray-50 rounded-xl px-4 py-3">
             <p className="text-sm text-gray-500">Username</p>
-            <h3 className="text-lg font-semibold text-gray-800">{user.firstName + " " + user.lastName}</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {user.firstName + " " + user.lastName}
+            </h3>
           </div>
 
           <div className="bg-gray-50 rounded-xl px-4 py-3">
@@ -125,27 +135,37 @@ const Profile = () => {
           </div>
         </div>
       </div>
-      <div className="w-full md:w-2/3 bg-white rounded-2xl shadow-md py-8 px-4 text-center">
-        <h1 className="text-2xl font-bold text-gray-800 mb-8 text-left">
-          All Posts
-        </h1>
-        <div className="grid grid-cols-2 gap-4">
+      <div className="w-full md:w-2/3 bg-white rounded-3xl shadow-lg p-6 md:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            All Posts
+          </h1>
+          <span className="text-sm text-gray-500">{posts.length} items</span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {posts.map((post) => {
             return (
-              <div key={post.id} className="relative group overflow-hidden rounded-lg shadow-sm">
+              <div
+                key={post.id}
+                className="relative group rounded-xl overflow-hidden bg-gray-100 aspect-square"
+              >
                 <img
                   src={post.image}
                   alt=""
-                  className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
-                  style={{ aspectRatio: '1/1' }}
+                  className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                 />
-                <Button 
-                  onClick={() => handleDelete(post.id)} 
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-500 text-white hover:bg-red-600 transition-all duration-300 cursor-pointer text-xs py-1 px-3"
-                  size="sm"
-                >
-                  Delete
-                </Button>
+
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300" />
+
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <Button
+                    onClick={() => handleDelete(post.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-lg shadow-md"
+                  >
+                    Delete
+                  </Button>
+                </div>
               </div>
             );
           })}
