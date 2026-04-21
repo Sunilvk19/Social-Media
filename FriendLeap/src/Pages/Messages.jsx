@@ -18,7 +18,10 @@ const Messages = ({ currentUser, messages, onSendMessage, onClearMessage }) => {
     onSendMessage(input);
     setInput("");
   };
-  
+
+  const handleNewMessage = () => {};
+  const handleNewGroup = () => {};
+
   return (
     <div className="flex h-screen bg-gray-50 p-4 font-sans rounded-lg">
       <div className="flex flex-col w-full max-w-4xl h-full bg-white rounded-xl shadow-lg">
@@ -54,7 +57,8 @@ const Messages = ({ currentUser, messages, onSendMessage, onClearMessage }) => {
             })}
           <div ref={messageEndRef} />
         </div>
-        <div className="p-4 bg-white">
+        
+        <div className="p-4 bg-white border-t">
           <Input
             icon={faMessage}
             value={input}
