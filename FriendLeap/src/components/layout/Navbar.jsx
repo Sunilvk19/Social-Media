@@ -7,6 +7,7 @@ import {
   faXmark,
   faBars,
   faMagnifyingGlass,
+  faCirclePlus,
 } from "@fortawesome/free-solid-svg-icons";
 import Input from "../common/Input";
 import Button from "../common/Button";
@@ -17,6 +18,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [notification, setNotification] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -36,7 +38,9 @@ const Navbar = () => {
     { name: "Explore", path: "/explore" },
     { name: "Messages", path: "/messages" },
   ];
-
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  }
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
@@ -46,7 +50,7 @@ const Navbar = () => {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0"
           >
             <img src={image} alt="logo" className="w-12 h-12 rounded-2xl" />
-            <span className="text-xl font-extrabold bg-clip-text text-transparent bg-orange-500 tracking-tight hidden sm:block">
+            <span className="text-2xl font-black bg-clip-text text-transparent bg-linear-to-r from-cyan-500 via-blue-500 to-purple-500 tracking-tighter hidden sm:block drop-shadow-sm">
               FriendLeap
             </span>
           </Link>
@@ -66,11 +70,12 @@ const Navbar = () => {
               );
             })}
           </ul>
-
+          <Button onClick={()=>setIsModalOpen(true)} icon={faCirclePlus}> Create Post </Button>
           <div className="flex items-center justify-end gap-3 sm:gap-5 shrink-0">
             <Input
               containerClassName="hidden lg:block w-[180px] xl:w-[220px]"
               icon={faMagnifyingGlass}
+              onChange={handleSearchChange}
               type="text"
               placeholder="Search..."
               className="pl-10 pr-4 py-2 w-full bg-gray-50 border border-gray-200 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all shadow-inner"
@@ -98,6 +103,7 @@ const Navbar = () => {
                 label={"profile"}
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
               />
+
               {isProfileOpen && (
                 <div className="absolute right-0 z-10 mt-2 flex flex-col w-48 py-1 bg-white rounded-lg shadow-lg border border-gray-100 cursor-pointer">
                   <Link
@@ -168,6 +174,7 @@ const Navbar = () => {
             </ul>
           </div>
         )}
+
       </nav>
       <div className="h-[73px]"></div>
     </>

@@ -8,7 +8,9 @@ const Messages = ({ currentUser, messages, onSendMessage, onClearMessage }) => {
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if(messages && messages.length > 0){
+      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   const handleSend = () => {
@@ -21,18 +23,18 @@ const Messages = ({ currentUser, messages, onSendMessage, onClearMessage }) => {
   const handleNewGroup = () => {};
 
   return (
-    <div className="flex w-full h-screen justify-center bg-gray-50 p-4 font-sans">
-      <div className="flex flex-col w-full max-w-4xl h-full bg-white rounded-xl shadow-lg border">
-        <div className="flex justify-between items-center p-4 border-b">
+    <div className="flex h-screen bg-gray-50 p-4 font-sans rounded-lg">
+      <div className="flex flex-col w-full max-w-4xl h-full bg-white rounded-xl shadow-lg">
+        <div className="flex justify-between items-center p-4 border-b border-gray-200 ">
           <h2 className="text-2xl font-semibold text-gray-800">Message</h2>
           <div className="space-x-2">
             <Button
-              onClick={handleNewMessage}
+              
               className="bg-cyan-400 text-white"
             >
               New Message
             </Button>
-            <Button onClick={handleNewGroup} className="bg-cyan-400 text-white">
+            <Button  className="bg-cyan-400 text-white">
               New Group
             </Button>
           </div>

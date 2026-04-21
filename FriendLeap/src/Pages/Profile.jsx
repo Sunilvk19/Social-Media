@@ -1,5 +1,7 @@
+import { icon } from "@fortawesome/fontawesome-svg-core";
 import localforage from "localforage";
 import React, { useEffect, useState } from "react";
+import Button from "../components/common/Button";
 
 const Profile = () => {
   const [user, setUser] = useState({});
@@ -9,10 +11,12 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const [userData, postData, profileData] = await Promise.all([
-          localforage.getItem("Current_user"),
-          localforage.getItem("posts"),
-          localforage.getItem("User_Profile"),
+        const userData = await localforage.getItem("Current_user");
+        if (!userData) return;
+        const [postData, profileData, followingData] = await Promise.all([
+          localforage.getItem(`posts_${userData.id}`),
+          localforage.getItem(`User_Profile_${userData.id}`),
+          localforage.getItem(`Following_state_${userData.id}`),
         ]);
         if (userData) setUser(userData);
         if (profileData?.image) setImage(profileData.image);
@@ -22,7 +26,6 @@ const Profile = () => {
           );
           setPosts(myPosts);
         }
-        const followingData = await localforage.getItem("Following_state");
         if (followingData) {
           const count = Object.values(followingData).filter(
             (following) => following === true,
@@ -49,17 +52,27 @@ const Profile = () => {
         reader.onerror = (error) => reject(error);
       });
       setImage(base64Image);
-      await localforage.setItem("User_Profile", { image: base64Image, user });
+      await localforage.setItem(`User_Profile_${user.id}`, { image: base64Image, user });
       console.log("Profile Picture saved Successfully !");
     } catch (err) {
       console.log("Failed to save the profile", err);
     }
   };
+  const handleDelete = async (id) => {
+    try {
+      const existingPosts = (await localforage.getItem("posts")) || [];
+      const updatedPosts = existingPosts.filter((post) => post.id !== id);
+      await localforage.setItem("posts", updatedPosts);
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+    } catch(error) {
+      console.error("Failed to delete post", error);
+    }
+  }
   return (
-    <div className="min-h-screen bg-gray-100 flex items-start py-10">
+    <div className="min-h-screen bg-gray-100 flex items-start py-10 gap-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 text-center">
         <h1 className="text-3xl font-bold text-gray-800 mb-8">
-          {user.name}'s Profile
+          {user.firstName}'s Profile
         </h1>
 
         <label className="cursor-pointer inline-block relative mb-8">
@@ -76,7 +89,7 @@ const Profile = () => {
         <div className="space-y-4 text-left">
           <div className="bg-gray-50 rounded-xl px-4 py-3">
             <p className="text-sm text-gray-500">Username</p>
-            <h3 className="text-lg font-semibold text-gray-800">{user.name}</h3>
+            <h3 className="text-lg font-semibold text-gray-800">{user.firstName + " " + user.lastName}</h3>
           </div>
 
           <div className="bg-gray-50 rounded-xl px-4 py-3">
@@ -119,12 +132,20 @@ const Profile = () => {
         <div className="grid grid-cols-2 gap-4">
           {posts.map((post) => {
             return (
-              <div key={post.id}>
+              <div key={post.id} className="relative group overflow-hidden rounded-lg shadow-sm">
                 <img
                   src={post.image}
                   alt=""
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                  style={{ aspectRatio: '1/1' }}
                 />
+                <Button 
+                  onClick={() => handleDelete(post.id)} 
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-500 text-white hover:bg-red-600 transition-all duration-300 cursor-pointer text-xs py-1 px-3"
+                  size="sm"
+                >
+                  Delete
+                </Button>
               </div>
             );
           })}

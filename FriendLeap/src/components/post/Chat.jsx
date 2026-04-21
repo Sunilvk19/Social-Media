@@ -1,6 +1,6 @@
 import axios from "axios";
 import localforage from "localforage";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Messages from "../../Pages/Messages";
 
 const Chat = () => {
@@ -16,21 +16,39 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
+    let timeoutId;
+    let isMounted = true;
+
     const fetchMessages = async () => {
       try {
         const res = await axios.get("http://localhost:5000/messages");
-        setMessages(res.data);
+        
+        if (isMounted) {
+          setMessages((prev) => {
+            if (JSON.stringify(prev) !== JSON.stringify(res.data)) {
+              return res.data;
+            }
+            return prev;
+          });
+        }
       } catch (error) {
         console.error(error.message);
+      } finally {
+        if (isMounted) {
+          timeoutId = setTimeout(fetchMessages, 3000);
+        }
       }
     };
 
     fetchMessages();
 
-    const intervalId = setInterval(fetchMessages, 3000);
-
-    return () => clearInterval(intervalId);
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, []);
+
+
 
   const handleMessages = async (text) => {
     console.log("1. Sending message: ", text);
@@ -60,7 +78,7 @@ const Chat = () => {
         newMessages,
       );
       console.log("3. Message successfully sent to DB:", res.data);
-      setMessages([...messages, res.data]);
+      setMessages((prev) => [...prev, res.data]);
     } catch (er) {
       console.error("4. Error from JSON server:", er.message);
     }
@@ -68,10 +86,9 @@ const Chat = () => {
 
   const handleClearMessage = async () => {
     try {
-      const deleteRequest = messages.map((mes) =>
-        axios.delete(`http://localhost:5000/messages/${mes.id}`),
-      );
-      await Promise.all(deleteRequest);
+      for (const mes of messages) {
+        await axios.delete(`http://localhost:5000/messages/${mes.id}`);
+      }
       setMessages([]);
     } catch (error) {
       console.error("Error clearing message", error.message);
