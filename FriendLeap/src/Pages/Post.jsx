@@ -80,7 +80,7 @@ function Post({ onPostCreated }) {
         alert("Please upload an image or video file.");
         return;
       }
-      if (file.size > 2 * 1024 * 1024) {
+      if (file.size > 10 * 1024 * 1024) {
         alert("Image size must be less than 2MB");
         return;
       }
@@ -226,28 +226,15 @@ function Post({ onPostCreated }) {
             </div>
           )}
           {isExpanded && (
-            <div className="flex items-center justify-between pt-4 mt-2 border-t border-gray-100 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center justify-between pt-1 mt-1 border-t border-gray-100 animate-in fade-in slide-in-from-top-4 duration-300">
               <div className="flex gap-1 md:gap-2">
                 <Button
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-blue-50 text-blue-600 font-medium text-sm transition-colors"
+                  onChange={handleImageChange}
+                  className="flex items-center gap-2 px-1 py-1 rounded-xl bg-gray-100 hover:bg-blue-50 text-blue-600 font-medium text-sm transition-colors"
                 >
                   <FontAwesomeIcon icon={faImage} className="text-lg" />
                   <span className="hidden sm:inline">Photo</span>
-                </Button>
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-green-500 font-medium text-sm transition-colors hover:bg-green-50"
-                >
-                  <FontAwesomeIcon icon={faVideo} className="text-lg" />
-                  <span className="hidden sm:inline">Video</span>
-                </Button>
-                <Button
-                  title="Coming soon!"
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-orange-400 font-medium text-sm cursor-not-allowed opacity-70"
-                >
-                  <FontAwesomeIcon icon={faSmile} className="text-lg" />
-                  <span className="hidden sm:inline">Feeling</span>
                 </Button>
 
                 <Input

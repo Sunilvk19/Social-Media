@@ -1,14 +1,12 @@
 import React from 'react'
 import Navbar from './Navbar'
 
-const Layout = ({children}) => {
+const Layout = ({ children, isChat = false }) => {
   return (
     <div>
-      <Navbar />
-      <main className='pt-2'>{children}</main>
-      {/* <Outlet /> */}
+      {!isChat && <Navbar />}
+      <main>{children}</main>
     </div>
-    
   )
 }
 
