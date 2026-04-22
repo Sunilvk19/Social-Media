@@ -1,12 +1,6 @@
 {
   "users": [
     {
-      "name": "sunil",
-      "email": "sunil12@gmail.com",
-      "password": "$2b$10$pOd.zMALNjtNOq9hsgztFeklGtV1IF3iWdzwJpdABDFsnbBpQEjCq",
-      "id": "hHxTPooopVU"
-    },
-    {
       "firstName": "sunil",
       "lastName": "kumar",
       "email": "sunil123@gmail.com",
@@ -14,6 +8,11 @@
       "id": "BjaLfb8xc6Q"
     },
     {
+      "id": "user_0ocvsfw_1776841208708",
+      "firstName": "Dinesh",
+      "lastName": "H",
+      "email": "dinesh1@gmail.com",
+      "password": "$2b$10$2.2Q97ckSADfQl8EAhiIMOGl7BQWz8QNR2MaTQZycPrGQFyJDit.C"
       "firstName": "Mahadev",
       "lastName": "Sunil",
       "email": "maha@gmail.com",
