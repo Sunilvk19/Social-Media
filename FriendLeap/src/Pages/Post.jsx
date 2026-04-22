@@ -19,36 +19,45 @@ function Post({ onPostCreated }) {
   const fileInputRef = useRef(null);
 
   const optimizeImage = (file, maxWidth = 1080, quality = 0.8) => {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
       const image = new Image();
       reader.readAsDataURL(file);
       reader.onload = () => {
         image.src = reader.result;
-      }
-      image.onload = () =>{
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+      };
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
         const ratio = Math.min(1, maxWidth / image.width);
         canvas.width = image.width * ratio;
         canvas.height = image.height * ratio;
         ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob((blob)=>{
-          if(!blob) return reject("Comprestion Failed");
-          const optimizedFile = new File([blob], file.name, {
-            type: "image/jpeg"
-          })
-          resolve({file: optimizedFile, url: URL.createObjectURL(optimizedFile)});
-        }, "image/jpeg", quality);
-      }
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return reject("Comprestion Failed");
+            const optimizedFile = new File([blob], file.name, {
+              type: "image/jpeg",
+            });
+            resolve({
+              file: optimizedFile,
+              url: URL.createObjectURL(optimizedFile),
+            });
+          },
+          "image/jpeg",
+          quality,
+        );
+      };
       image.onerror = reject;
-    })
-  }
+    });
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
       const currentUser = await localforage.getItem(`Current_user`);
-      const userProfile = await localforage.getItem(`User_Profile_${currentUser.id}`);
+      const userProfile = await localforage.getItem(
+        `User_Profile_${currentUser.id}`,
+      );
       if (currentUser) {
         setUser({ ...currentUser, image: userProfile?.image || null });
       }
@@ -65,29 +74,35 @@ function Post({ onPostCreated }) {
   }, [image]);
 
   const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file.type.startsWith("image/") && !file.type.startsWith("video/")){
-      alert("Please upload an image or video file.");
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024){
-      alert("Image size must be less than 2MB");
-      return;
-    }
-    if (image?.url){
-      URL.revokeObjectURL(image.url);
-    }
+    try {
+      const file = e.target.files[0];
+      if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
+        alert("Please upload an image or video file.");
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image size must be less than 2MB");
+        return;
+      }
+      if (image?.url) {
+        URL.revokeObjectURL(image.url);
+      }
 
-    if (file.type.startsWith("image/")){
-      const optimized = await optimizeImage(file);
-      setImage(optimized);
-    }else{
-      setImage({
-        file,
-        url: URL.createObjectURL(file)
-      });
+      if (file.type.startsWith("image/")) {
+        const optimized = await optimizeImage(file);
+        setImage(optimized);
+      } else {
+        setImage({
+          file,
+          url: URL.createObjectURL(file),
+        });
+      }
+      setIsExpanded(true);
+    } catch (error) {
+      console.error("Failed to select image", error);
+      alert("Failed to select image. Please try again.");
+      throw new Error("Failed to select image");
     }
-    setIsExpanded(true);
   };
 
   const removeImage = () => {
@@ -103,6 +118,7 @@ function Post({ onPostCreated }) {
   const handleSubmit = async () => {
     if (!name.trim() && !image?.file) {
       alert("Please enter a caption or upload an image");
+      
       return;
     }
     if (!user) {
@@ -133,23 +149,24 @@ function Post({ onPostCreated }) {
         comments: [],
         timestamp: new Date().toISOString(),
       };
-      
+
       if (onPostCreated) {
         onPostCreated(newPost);
       } else {
-        const existingPosts = (await localforage.getItem(`posts_${user.id}`)) || [];
+        const existingPosts =
+          (await localforage.getItem(`posts_${user.id}`)) || [];
         const updatedPosts = [newPost, ...existingPosts];
         await localforage.setItem(`posts_${user.id}`, updatedPosts);
       }
       removeImage();
       setName("");
       setIsExpanded(false);
-      setIsSubmiting(false);
     } catch (error) {
       console.error("Failed to create Post", error);
       alert("Failed to create post. Please try again.");
-      setIsSubmiting(false);
+      throw new Error("Failed to create post");
     }
+    setIsSubmiting(false);
   };
 
   return (
@@ -186,7 +203,7 @@ function Post({ onPostCreated }) {
           />
           {image && (
             <div className="relative mt-3 mb-2 animate-in fade-in zoom-in-95 duration-200">
-              {image.file.type.startsWith('video/') ? (
+              {image.file.type.startsWith("video/") ? (
                 <video
                   src={image.url}
                   controls

@@ -60,6 +60,7 @@ const Profile = () => {
       console.log("Profile Picture saved Successfully !");
     } catch (err) {
       console.log("Failed to save the profile", err);
+      throw new Error("Failed to save the profile");
     }
   };
   const handleDelete = async (id) => {
