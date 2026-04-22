@@ -90,6 +90,7 @@ const Home = () => {
         if (likedData) setLikedPosts(new Set(likedData));
       } catch (error) {
         console.log("Error fetching data", error);
+        throw new Error("Failed to fetch data");
       } finally {
         setLoading(false);
       }
@@ -116,11 +117,9 @@ const Home = () => {
     });
   };
 
-  const fetchFeed = posts?.filter((post)=>{
-    // console.log(post.userId===currentUser.id)
+  const fetchFeed = posts?.filter((post) => {
     return post.userId === currentUser.id || isFollowing[post.userId];
-  })
-
+  });
   return (
     <>
       {loading && <div>Loading......</div>}
@@ -163,7 +162,7 @@ const Home = () => {
                       <div className="group/stat cursor-pointer">
                         <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
                           {
-                            fetchFeed.filter(
+                            posts.filter(
                               (post) => post.userId === currentUser?.id,
                             ).length
                           }
