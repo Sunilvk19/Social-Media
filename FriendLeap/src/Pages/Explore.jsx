@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { getMockPosts, getMockUsers } from "../services/Mock";
 import Input from "../components/common/Input";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { getRealUsers } from "../services/User";
 
 const Explore = () => {
   const [currentUser, setCurrentUser] = useState({});
@@ -17,11 +18,14 @@ const Explore = () => {
         const userData = await localforage.getItem("Current_user");
         if (userData) setCurrentUser(userData);
 
-        const [mockPosts, mockUsers] = await Promise.all([
+        const [mockPosts, mockUsers, realUsers] = await Promise.all([
           getMockPosts(),
           getMockUsers(),
+          getRealUsers(),
         ]);
-        if (mockUsers?.users) setUsers(mockUsers.users.slice(0, 8));
+
+        const totalUsers = [...realUsers, ...mockUsers.users];
+        setUsers(totalUsers);
         if (mockPosts?.posts) setPosts(mockPosts.posts);
       } catch (error) {
         console.log(error.message);
@@ -31,11 +35,16 @@ const Explore = () => {
     };
     fetchData();
   }, []);
+
   const query = searchQuery.trim().toLowerCase();
-  const filteredUsers = query? users.filter((user)=>{
-    const fullName = `${user.username}`.toLowerCase();
-    return fullName.includes(query);
-  }): users;
+
+  const filteredUsers = users
+  .filter((user) => user.id !== currentUser.id)
+  .filter((user) => {
+    if (!query) return true;
+    const fullName = user.username? user.username : `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    return fullName.toLowerCase().includes(query.toLowerCase());
+  });
 
   const filteredPosts = query? posts.filter((post)=>{
     const title = post.title.toLowerCase();
@@ -91,9 +100,9 @@ const Explore = () => {
                     <span className="text-sm font-bold text-gray-800">
                       {user.firstName} {user.lastName}
                     </span>
-                    <span className="text-xs font-semibold text-gray-500">
+                    {/* <span className="text-xs font-semibold text-gray-500">
                       @{user.username}
-                    </span>
+                    </span> */}
                     <span>
                       {user.followers} 
                     </span>
