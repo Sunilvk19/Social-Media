@@ -8,6 +8,7 @@ import localforage from "localforage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import { getRealUsers } from "../services/User";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -57,17 +58,15 @@ const Home = () => {
         const userData = await localforage.getItem("Current_user");
         if (!userData) return;
         setCurrentUser(userData);
-        const [mockRes, realRes] = await Promise.all([
-          getMockUsers(),
-          getRealUsers(),
-        ]);
-        
-        const combinedUsers = [
-          ...(realRes || []),
-          ...(mockRes?.users || [])
-        ];
-        setUsers(combinedUsers);
 
+        const [mockPosts, mockUsers, realUsers] = await Promise.all([
+                  getMockPosts(),
+                  getMockUsers(),
+                  getRealUsers(),
+                ]);
+
+        const totalUsers = [...realUsers, ...mockUsers.users];
+        setUsers(totalUsers);
         const localPosts = await localforage.getItem(`posts_${userData.id}`);
         if (localPosts) {
           setPosts(localPosts);
@@ -109,7 +108,10 @@ const Home = () => {
     });
   };
 
+  console.log(users);
+
   const filteredUsers = users.filter((user) => user.id !== currentUser.id);
+
   const handleSuggestion = () => {
     setCount((prev) => {
       const next = prev + 4;
