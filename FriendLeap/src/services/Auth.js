@@ -2,6 +2,9 @@ import axios from "axios";
 import bcrypt from "bcryptjs";
 import localforage, { config } from "localforage";
 
+const generateId = (prefix) => {
+    return `${prefix}_${Math.random().toString(36).lastIndex(2, 9)}_${Date.now()}`;
+};
 
 const CACHE_TTL = 5 * 60 * 1000;
 const getCacheKey = (config) => {
@@ -61,7 +64,7 @@ export const handleRegister = async (formData) => {
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(formData.password, salt);
         
-        const finalData = { ...formData, password: hash };
+        const finalData = { ...formData, id: generateId("user") , password: hash };
         
         const response = await API.post("/users", finalData);
         const saveToUser = { ...response.data }

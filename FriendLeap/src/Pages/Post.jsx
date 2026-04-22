@@ -18,6 +18,33 @@ function Post({ onPostCreated }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const fileInputRef = useRef(null);
 
+  const optimizeImage = (file, maxWidth = 1080, quality = 0.8) => {
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      const image = new Image();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        image.src = reader.result;
+      }
+      image.onload = () =>{
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const ratio = Math.min(1, maxWidth / image.width);
+        canvas.width = image.width * ratio;
+        canvas.height = image.height * ratio;
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob)=>{
+          if(!blob) return reject("Comprestion Failed");
+          const optimizedFile = new File([blob], file.name, {
+            type: "image/jpeg"
+          })
+          resolve({file: optimizedFile, url: URL.createObjectURL(optimizedFile)});
+        }, "image/jpeg", quality);
+      }
+      image.onerror = reject;
+    })
+  }
+
   useEffect(() => {
     const fetchUser = async () => {
       const currentUser = await localforage.getItem(`Current_user`);
@@ -37,19 +64,30 @@ function Post({ onPostCreated }) {
     };
   }, [image]);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (image?.url) {
-        URL.revokeObjectURL(image.url);
-      }
-      const currentImageUrl = URL.createObjectURL(file);
-      setImage({
-        file: file,
-        url: currentImageUrl,
-      });
-      setIsExpanded(true);
+    if (!file.type.startsWith("image/") && !file.type.startsWith("video/")){
+      alert("Please upload an image or video file.");
+      return;
     }
+    if (file.size > 2 * 1024 * 1024){
+      alert("Image size must be less than 2MB");
+      return;
+    }
+    if (image?.url){
+      URL.revokeObjectURL(image.url);
+    }
+
+    if (file.type.startsWith("image/")){
+      const optimized = await optimizeImage(file);
+      setImage(optimized);
+    }else{
+      setImage({
+        file,
+        url: URL.createObjectURL(file)
+      });
+    }
+    setIsExpanded(true);
   };
 
   const removeImage = () => {

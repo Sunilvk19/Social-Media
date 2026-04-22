@@ -42,12 +42,9 @@ const Home = () => {
   };
 
   const handleFollowing = async (id) => {
-    setIsFollowing( (prev) => {
+    setIsFollowing((prev) => {
       const updatedState = { ...prev, [id]: !prev[id] };
-      localforage.setItem(
-        `Following_state_${currentUser.id}`,
-        updatedState,
-      );
+      localforage.setItem(`Following_state_${currentUser.id}`, updatedState);
       return updatedState;
     });
   };
@@ -59,29 +56,25 @@ const Home = () => {
         if (!userData) return;
         setCurrentUser(userData);
         const usersRes = await getMockUsers();
-        if(usersRes?.users){
+        if (usersRes?.users) {
           setUsers(usersRes.users);
         }
         const localPosts = await localforage.getItem(`posts_${userData.id}`);
-        if(localPosts){
+        if (localPosts) {
           setPosts(localPosts);
-        }else{
+        } else {
           const postsRes = await getMockPosts();
-          if(postsRes?.posts){
+          if (postsRes?.posts) {
             setPosts(postsRes.posts);
-            await localforage.setItem(
-              `posts_${userData.id}`,
-              postsRes.posts
-            )
+            await localforage.setItem(`posts_${userData.id}`, postsRes.posts);
           }
         }
-        const [ followingData, userProfile, likedData] =
-          await Promise.all([
-            localforage.getItem(`Following_state_${userData.id}`),
-            localforage.getItem(`User_Profile_${userData.id}`),
-            localforage.getItem(`liked_posts_${userData.id}`),
-          ]);
-        if (userProfile?.image){
+        const [followingData, userProfile, likedData] = await Promise.all([
+          localforage.getItem(`Following_state_${userData.id}`),
+          localforage.getItem(`User_Profile_${userData.id}`),
+          localforage.getItem(`liked_posts_${userData.id}`),
+        ]);
+        if (userProfile?.image) {
           setCurrentUser((prev) => ({
             ...prev,
             image: userProfile.image,
@@ -113,13 +106,15 @@ const Home = () => {
       return next >= filteredUsers.length ? filteredUsers.length : next;
     });
   };
-
-  const fetchFeed = posts.filter((post) => {
-    const isFollower = currentUser.followers?.includes(post.userId);
-    return post.userId === currentUser.id || isFollowing[post.userId] || isFollower;
-  });
+  console.log(currentUser.id)
+  const fetchFeed = posts?.filter((post)=>{
+    // console.log(post.userId===currentUser.id)
+    return post.userId === currentUser.id || isFollowing[post.userId];
+  })
+  console.log(fetchFeed)
   return (
     <>
+      {loading && <div>Loading......</div>}
       {!loading && (
         <div className="min-h-screen bg-gray-50 pt-8 pb-5 font-sans">
           <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
@@ -148,7 +143,8 @@ const Home = () => {
                     </div>
                     <div className="text-center mb-4">
                       <h2 className="text-xl font-bold text-gray-800 tracking-tight">
-                        {currentUser?.firstName + " " + currentUser?.lastName || "User"}
+                        {currentUser?.firstName + " " + currentUser?.lastName ||
+                          "User"}
                       </h2>
                       <p className="text-gray-500 text-sm">
                         {currentUser?.email || "Email"}
@@ -167,7 +163,7 @@ const Home = () => {
                           Posts
                         </p>
                       </div>
-                      <div className="group/stat cursor-pointer">
+                      <div className="group/stat cursor-pointer gap">
                         <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
                           {
                             Object.values(isFollowing).filter(
@@ -179,14 +175,6 @@ const Home = () => {
                           Following
                         </p>
                       </div>
-                      <div className="group/stat cursor-pointer">
-                        <p className="font-extrabold text-gray-800 group-hover/stat:text-indigo-600 transition-colors">
-                          {currentUser?.followers?.length || 0} 
-                        </p>
-                        <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
-                          Followers
-                        </p>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -194,7 +182,7 @@ const Home = () => {
               <div className="flex-1 max-w-2xl w-full flex flex-col space-y-6">
                 <div className="bg-white ">
                   <Post onPostCreated={handleNewPost} />
-                  {posts?.map((post) => {
+                  {fetchFeed?.map((post) => {
                     return (
                       <div
                         key={post.id}
@@ -210,7 +198,9 @@ const Home = () => {
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-lg font-bold text-indigo-500 bg-amber-100 hover:cursor-pointer">
-                                {post?.authorName ? post.authorName.charAt(0).toUpperCase() : "U"}
+                                {post?.authorName
+                                  ? post.authorName.charAt(0).toUpperCase()
+                                  : "U"}
                               </div>
                             )}
                           </div>
