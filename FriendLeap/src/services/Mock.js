@@ -8,7 +8,7 @@ export const getMockUsers = async () => {
         return res.data;
     } catch (err) {
         console.error("API Error: ", err);
-        throw err;
+        throw new Error("Failed to fetch users");
     }
     
 };
@@ -20,7 +20,7 @@ export const getMockPosts = async (id) => {
         return res.data;
     } catch(err){
         console.error("API Error: ", err);
-        throw err;
+        throw new Error("Failed to fetch posts");
     }
 };
 
@@ -32,6 +32,7 @@ export const searchByUsers = async (query) => {
         return res.data;
     }catch(err){
         console.error("API Error: ",err);
+        throw new Error("Failed to search users");
     }
 }
 
@@ -42,5 +43,6 @@ export const searchPosts = async (query) => {
         return res.data;
     }catch(err){
         console.error("API Error: ", err);
+        throw new Error("Failed to search posts");
     }
 }
