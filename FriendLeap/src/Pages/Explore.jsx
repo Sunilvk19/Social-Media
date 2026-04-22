@@ -29,6 +29,7 @@ const Explore = () => {
         if (mockPosts?.posts) setPosts(mockPosts.posts);
       } catch (error) {
         console.log(error.message);
+        throw new Error("Failed to fetch data");
       } finally {
         setLoading(false);
       }
@@ -46,11 +47,13 @@ const Explore = () => {
     return fullName.toLowerCase().includes(query.toLowerCase());
   });
 
-  const filteredPosts = query? posts.filter((post)=>{
-    const title = post.title.toLowerCase();
-    const body = post.body.toLowerCase();
-    return title.includes(query) || body.includes(query);
-  }): posts;
+  const filteredPosts = query
+    ? posts.filter((post) => {
+        const title = post.title.toLowerCase();
+        const body = post.body.toLowerCase();
+        return title.includes(query) || body.includes(query);
+      })
+    : posts;
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
