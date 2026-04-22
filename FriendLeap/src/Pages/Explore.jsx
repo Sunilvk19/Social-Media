@@ -83,7 +83,7 @@ const Explore = () => {
               Discover People
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {filteredUsers.map((user) => (
+              {filteredUsers.slice(0,8).map((user) => (
                 <div
                   key={user.id}
                   className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-lg transition-shadow cursor-pointer"
