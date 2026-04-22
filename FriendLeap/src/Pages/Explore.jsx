@@ -1,6 +1,8 @@
 import localforage from "localforage";
 import React, { useEffect, useState } from "react";
 import { getMockPosts, getMockUsers } from "../services/Mock";
+import { getRealUsers } from "../services/User";
+
 import Input from "../components/common/Input";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
@@ -17,11 +19,19 @@ const Explore = () => {
         const userData = await localforage.getItem("Current_user");
         if (userData) setCurrentUser(userData);
 
-        const [mockPosts, mockUsers] = await Promise.all([
+        const [mockPosts, mockRes, realRes] = await Promise.all([
           getMockPosts(),
           getMockUsers(),
+          getRealUsers(),
         ]);
-        if (mockUsers?.users) setUsers(mockUsers.users.slice(0, 8));
+        
+        const combinedUsers = [
+          ...(realRes || []),
+          ...(mockRes?.users || [])
+        ];
+        
+        setUsers(combinedUsers.slice(0, 8));
+
         if (mockPosts?.posts) setPosts(mockPosts.posts);
       } catch (error) {
         console.log(error.message);

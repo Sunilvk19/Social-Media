@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getMockUsers, getMockPosts } from "../services/Mock";
+import { getRealUsers } from "../services/User";
+
 import Button from "../components/common/Button";
 import Post from "./Post";
 import localforage from "localforage";
@@ -55,10 +57,17 @@ const Home = () => {
         const userData = await localforage.getItem("Current_user");
         if (!userData) return;
         setCurrentUser(userData);
-        const usersRes = await getMockUsers();
-        if (usersRes?.users) {
-          setUsers(usersRes.users);
-        }
+        const [mockRes, realRes] = await Promise.all([
+          getMockUsers(),
+          getRealUsers(),
+        ]);
+        
+        const combinedUsers = [
+          ...(realRes || []),
+          ...(mockRes?.users || [])
+        ];
+        setUsers(combinedUsers);
+
         const localPosts = await localforage.getItem(`posts_${userData.id}`);
         if (localPosts) {
           setPosts(localPosts);

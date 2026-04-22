@@ -1,12 +1,6 @@
 {
   "users": [
     {
-      "name": "sunil",
-      "email": "sunil12@gmail.com",
-      "password": "$2b$10$pOd.zMALNjtNOq9hsgztFeklGtV1IF3iWdzwJpdABDFsnbBpQEjCq",
-      "id": "hHxTPooopVU"
-    },
-    {
       "firstName": "sunil",
       "lastName": "kumar",
       "email": "sunil123@gmail.com",
