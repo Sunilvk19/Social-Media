@@ -25,6 +25,7 @@ const Explore = () => {
         if (mockPosts?.posts) setPosts(mockPosts.posts);
       } catch (error) {
         console.log(error.message);
+        throw new Error("Failed to fetch data");
       } finally {
         setLoading(false);
       }
@@ -32,16 +33,20 @@ const Explore = () => {
     fetchData();
   }, []);
   const query = searchQuery.trim().toLowerCase();
-  const filteredUsers = query? users.filter((user)=>{
-    const fullName = `${user.username}`.toLowerCase();
-    return fullName.includes(query);
-  }): users;
+  const filteredUsers = query
+    ? users.filter((user) => {
+        const fullName = `${user.username}`.toLowerCase();
+        return fullName.includes(query);
+      })
+    : users;
 
-  const filteredPosts = query? posts.filter((post)=>{
-    const title = post.title.toLowerCase();
-    const body = post.body.toLowerCase();
-    return title.includes(query) || body.includes(query);
-  }): posts;
+  const filteredPosts = query
+    ? posts.filter((post) => {
+        const title = post.title.toLowerCase();
+        const body = post.body.toLowerCase();
+        return title.includes(query) || body.includes(query);
+      })
+    : posts;
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
@@ -94,9 +99,7 @@ const Explore = () => {
                     <span className="text-xs font-semibold text-gray-500">
                       @{user.username}
                     </span>
-                    <span>
-                      {user.followers} 
-                    </span>
+                    <span>{user.followers}</span>
                   </div>
                 </div>
               ))}
