@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import localforage, { config } from "localforage";
 
 const generateId = (prefix) => {
-    return `${prefix}_${Math.random().toString(36).lastIndex(2, 9)}_${Date.now()}`;
+    return `${prefix}_${Math.random().toString(36).slice(2, 9)}_${Date.now()}`;
 };
 
 const CACHE_TTL = 5 * 60 * 1000;
@@ -72,7 +72,7 @@ export const handleRegister = async (formData) => {
         await localforage.setItem("user", JSON.stringify(saveToUser));
         return saveToUser;
     } catch (error) {
-        throw new Error("Failed to register");
+        console.log(error.message);
     }
 }
 
@@ -94,7 +94,7 @@ export const handleLogin = async (email, password) => {
         return user;
     } catch (error) {
         if (error.message === "No user found with this email" || error.message === "Invalid Password") {
-            throw error;
+            throw new Error( error.message);
         }
         throw new Error("Failed to login");
     }
