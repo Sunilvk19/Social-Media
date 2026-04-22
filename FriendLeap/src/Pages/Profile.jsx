@@ -8,6 +8,7 @@ const Profile = () => {
   const [image, setImage] = useState(null);
   const [posts, setPosts] = useState([]);
   const [followingCount, setFollowingCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -110,10 +111,6 @@ const Profile = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="bg-indigo-50 rounded-xl py-4 flex flex-col items-center">
-              <span className="text-sm text-gray-500">Followers</span>
-              <h3 className="text-xl font-bold text-gray-600">0</h3>
-            </div>
             <div className="bg-indigo-50 rounded-xl py-4 flex flex-col items-center">
               <span className="text-sm text-gray-500">Following</span>
               <h3 className="text-xl font-bold text-indigo-600">
