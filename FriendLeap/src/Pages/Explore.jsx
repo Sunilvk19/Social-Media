@@ -1,6 +1,7 @@
 import localforage from "localforage";
 import React, { useEffect, useState } from "react";
 import { getMockPosts, getMockUsers } from "../services/Mock";
+
 import Input from "../components/common/Input";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { getRealUsers } from "../services/User";
@@ -11,6 +12,7 @@ const Explore = () => {
   const [users, setUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -112,6 +114,7 @@ const Explore = () => {
                   </div>
                 </div>
               ))}
+              
             </div>
           </section>
           <section>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import Input from "../components/common/Input";
-import Button from "../components/common/Button";
+import Input from "../common/Input";
+import Button from "../common/Button";
 import { faMessage } from "@fortawesome/free-solid-svg-icons";
 
 const Messages = ({ currentUser, messages, onSendMessage, onClearMessage }) => {

@@ -1,7 +1,7 @@
 import axios from "axios";
 import localforage from "localforage";
-import React, { useEffect, useRef, useState } from "react";
-import Messages from "../../Pages/Messages";
+import React, { useEffect, useState } from "react";
+import Messages from "./Messages";
 
 const Chat = () => {
   const [currentUser, setCurrentUser] = useState(null);

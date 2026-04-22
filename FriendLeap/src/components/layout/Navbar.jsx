@@ -70,7 +70,6 @@ const Navbar = () => {
               );
             })}
           </ul>
-          <Button onClick={()=>setIsModalOpen(true)} icon={faCirclePlus} />
           <div className="flex items-center justify-end gap-2 sm:gap-3 shrink-0">
             <Input
               containerClassName="hidden lg:block w-[180px] xl:w-[220px]"
@@ -120,7 +119,7 @@ const Navbar = () => {
                   </Link>
                   <Button
                     onClick={handleLogoutClick}
-                    className="w-full text-left block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                    className="w-full text-center block bg-red-500 text-white font-semibold mt-2 mx-1 px-4 py-1 rounded-md transition-colors"
                   >
                     Logout
                   </Button>
