@@ -1,7 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import Input from "../common/Input";
 import Button from "../common/Button";
-import { faMessage } from "@fortawesome/free-solid-svg-icons";
+import { 
+  faMessage, 
+  faSearch, 
+  faEllipsisVertical, 
+  faPaperclip, 
+  faFaceSmile,
+  faTrash
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Messages = ({ 
   currentUser, 
@@ -13,6 +21,7 @@ const Messages = ({
   onClearMessage 
 }) => {
   const [input, setInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const messageEndRef = useRef(null);
 
   useEffect(() => {
@@ -25,105 +34,206 @@ const Messages = ({
     setInput("");
   };
 
+  const filteredUsers = followedUsers.filter(user => 
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="flex h-screen bg-gray-50 p-4 font-sans gap-4">
-      <div className="w-80 h-full bg-white rounded-xl shadow-lg flex flex-col overflow-hidden border border-gray-200">
-        <div className="p-5 border-b border-gray-100 bg-white">
-          <h2 className="text-xl font-bold text-gray-800">Messages</h2>
+    <div className="flex h-[calc(100vh-80px)] bg-gray-50/50 font-sans gap-6 p-6 overflow-hidden">
+      {/* Sidebar: Contact List */}
+      <div className="w-96 flex flex-col bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden animate-in slide-in-from-left-8 duration-700">
+        <div className="p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Messages</h2>
+            <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+              <FontAwesomeIcon icon={faMessage} />
+            </div>
+          </div>
+          
+          <div className="relative group">
+            <Input
+              icon={faSearch}
+              placeholder="Search contacts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="rounded-2xl border-gray-100 bg-gray-50/50 py-3 group-focus-within:bg-white transition-all shadow-none"
+            />
+          </div>
         </div>
         
-        <div className="flex-1 overflow-y-auto">
-          {followedUsers.length > 0 ? (
-            followedUsers.map((user) => (
-              <div
-                key={user.id}
-                onClick={() => onSelectUser(user)}
-                className={`flex items-center gap-3 p-4 cursor-pointer transition-all border-l-4 ${
-                  selectedUser?.id === user.id 
-                    ? "bg-cyan-50 border-cyan-500" 
-                    : "border-transparent hover:bg-gray-50"
-                }`}
-              >
-                <img 
-                  src={user.image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} 
-                  className="w-12 h-12 rounded-full border border-gray-200 object-cover"
-                  alt="Avatar"
-                />
-                <div className="flex-1 truncate">
-                  <h4 className="font-bold text-gray-800 text-sm">{user.firstName} {user.lastName}</h4>
-                  <p className="text-xs text-gray-500 truncate">Tap to chat</p>
+        <div className="flex-1 overflow-y-auto px-3 pb-6 custom-scrollbar">
+          {filteredUsers.length > 0 ? (
+            <div className="space-y-1">
+              {filteredUsers.map((user) => (
+                <div
+                  key={user.id}
+                  onClick={() => onSelectUser(user)}
+                  className={`group relative flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
+                    selectedUser?.id === user.id 
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 translate-x-2" 
+                      : "hover:bg-indigo-50 text-gray-700 hover:translate-x-1"
+                  }`}
+                >
+                  <div className="relative shrink-0">
+                    <img 
+                      src={user.image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} 
+                      className={`w-14 h-14 rounded-2xl object-cover border-2 shadow-sm transition-transform group-hover:scale-105 ${
+                        selectedUser?.id === user.id ? "border-indigo-400" : "border-white"
+                      }`}
+                      alt="Avatar"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full shadow-sm" />
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-baseline mb-0.5">
+                      <h4 className={`font-bold truncate text-[15px] ${selectedUser?.id === user.id ? "text-white" : "text-gray-900"}`}>
+                        {user.firstName} {user.lastName}
+                      </h4>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider opacity-60 ${selectedUser?.id === user.id ? "text-white" : "text-gray-400"}`}>
+                        12:45 PM
+                      </span>
+                    </div>
+                    <p className={`text-xs truncate font-medium ${selectedUser?.id === user.id ? "text-indigo-100" : "text-gray-500"}`}>
+                      Tap to open conversation...
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           ) : (
-            <div className="p-10 text-center">
-              <p className="text-gray-400 text-sm">Follow someone on the Home page to start a chat!</p>
+            <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4 text-gray-300">
+                <FontAwesomeIcon icon={faSearch} size="lg" />
+              </div>
+              <p className="text-gray-400 text-sm font-medium leading-relaxed">
+                {searchQuery ? "No contacts found matching your search." : "Follow someone to start a conversation!"}
+              </p>
             </div>
           )}
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col h-full bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+      {/* Main Chat Window */}
+      <div className="flex-1 flex flex-col bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-500">
         {selectedUser ? (
           <>
-            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-white shadow-sm z-10">
-              <div className="flex items-center gap-3">
-                <img src={selectedUser.image} className="w-10 h-10 rounded-full border" alt="" />
-                <div>
-                  <h2 className="text-lg font-bold text-gray-800">{selectedUser.firstName} {selectedUser.lastName}</h2>
-                  <span className="text-xs text-green-500 font-medium">● Online</span>
+            {/* Chat Header */}
+            <div className="px-8 py-5 flex items-center justify-between border-b border-gray-50 bg-white/80 backdrop-blur-md sticky top-0 z-20">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <img 
+                    src={selectedUser.image} 
+                    className="w-12 h-12 rounded-2xl object-cover border-2 border-indigo-50 shadow-sm" 
+                    alt="" 
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
                 </div>
-              </div>
-              <Button onClick={onClearMessage} className="bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600 text-xs py-1 px-4">
-                Clear Chat
-              </Button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 bg-gray-50 space-y-4">
-              {messages.map((mes, index) => (
-                <div
-                  key={mes.id || index}
-                  className={`flex ${mes.senderId.toString() === currentUser?.id.toString() ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[70%] p-3 rounded-2xl shadow-sm text-sm ${
-                      mes.senderId.toString() === currentUser?.id.toString()
-                        ? "bg-cyan-500 text-white rounded-tr-none"
-                        : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
-                    }`}
-                  >
-                    {mes.text}
+                <div>
+                  <h2 className="text-lg font-black text-gray-900 tracking-tight leading-tight">
+                    {selectedUser.firstName} {selectedUser.lastName}
+                  </h2>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-[11px] font-bold text-green-500 uppercase tracking-widest">Active Now</span>
                   </div>
                 </div>
-              ))}
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Button 
+                  onClick={onClearMessage} 
+                  variant="ghost"
+                  className="w-10 h-10 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border-none"
+                  icon={faTrash}
+                />
+                <Button 
+                  variant="ghost"
+                  className="w-10 h-10 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all border-none"
+                  icon={faEllipsisVertical}
+                />
+              </div>
+            </div>
+
+            {/* Message Feed */}
+            <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30 custom-scrollbar">
+              <div className="flex justify-center mb-8">
+                <span className="px-4 py-1.5 bg-white shadow-sm border border-gray-100 rounded-full text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                  Today
+                </span>
+              </div>
+              
+              {messages.map((mes, index) => {
+                const isMine = mes.senderId.toString() === currentUser?.id.toString();
+                return (
+                  <div
+                    key={mes.id || index}
+                    className={`flex ${isMine ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+                  >
+                    <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[70%]`}>
+                      <div
+                        className={`px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm ${
+                          isMine
+                            ? "bg-indigo-600 text-white rounded-tr-none shadow-indigo-100"
+                            : "bg-white text-gray-800 border border-gray-100 rounded-tl-none shadow-gray-100"
+                        }`}
+                      >
+                        {mes.text}
+                      </div>
+                      <span className="text-[10px] mt-1.5 font-bold text-gray-400 uppercase tracking-wider px-1">
+                        12:45 PM
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
               <div ref={messageEndRef} />
             </div>
 
-            <div className="p-4 bg-white border-t border-gray-100">
-              <Input
-                icon={faMessage}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={`Message ${selectedUser.firstName}...`}
-                className="w-full py-3 pr-20"
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                endAdornment={
-                  <Button
-                    onClick={handleSend}
-                    className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-full px-6 py-2 shadow-md transition-transform active:scale-95"
-                  >
-                    Send
-                  </Button>
-                }
-              />
+            {/* Input Area */}
+            <div className="p-6 bg-white border-t border-gray-50">
+              <div className="flex items-center gap-4 bg-gray-50/50 rounded-2xl p-2 pr-2 border border-gray-100 focus-within:border-indigo-200 focus-within:bg-white transition-all">
+                <div className="flex gap-1 pl-2">
+                  <button className="w-10 h-10 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-white transition-all">
+                    <FontAwesomeIcon icon={faPaperclip} />
+                  </button>
+                  <button className="w-10 h-10 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-white transition-all">
+                    <FontAwesomeIcon icon={faFaceSmile} />
+                  </button>
+                </div>
+                
+                <input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={`Type a message to ${selectedUser.firstName}...`}
+                  className="flex-1 bg-transparent border-none py-3 px-2 text-gray-800 text-[15px] focus:outline-none"
+                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                />
+                
+                <Button
+                  onClick={handleSend}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-6 py-3 shadow-lg shadow-indigo-100 transition-all hover:scale-[1.02] active:scale-[0.98] border-none font-bold text-sm"
+                >
+                  Send
+                </Button>
+              </div>
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-               <FontAwesomeIcon icon={faMessage} className="text-3xl" />
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-12 space-y-6">
+            <div className="relative">
+              <div className="w-32 h-32 bg-indigo-50 rounded-[40px] flex items-center justify-center text-indigo-600 transform -rotate-12 animate-pulse">
+                <FontAwesomeIcon icon={faMessage} size="3x" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-12 h-12 bg-white rounded-2xl shadow-lg flex items-center justify-center text-indigo-500 animate-bounce duration-2000">
+                <FontAwesomeIcon icon={faMessage} size="lg" />
+              </div>
             </div>
-            <p>Select a friend to start chatting</p>
+            <div className="max-w-xs space-y-2">
+              <h3 className="text-2xl font-black text-gray-900 tracking-tight">Your Conversations</h3>
+              <p className="text-gray-500 font-medium leading-relaxed">
+                Select a friend from the sidebar to start a new conversation or continue an old one.
+              </p>
+            </div>
           </div>
         )}
       </div>
