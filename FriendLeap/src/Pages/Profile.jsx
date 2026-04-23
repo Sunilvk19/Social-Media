@@ -2,13 +2,16 @@ import { icon } from "@fortawesome/fontawesome-svg-core";
 import localforage from "localforage";
 import React, { useEffect, useState } from "react";
 import Button from "../components/common/Button";
+import Input from "../components/common/Input";
+import Modal from "../components/common/Modal";
 
 const Profile = () => {
   const [user, setUser] = useState({});
   const [image, setImage] = useState(null);
   const [posts, setPosts] = useState([]);
   const [followingCount, setFollowingCount] = useState(0);
-  const [followersCount, setFollowersCount] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({});
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -17,9 +20,10 @@ const Profile = () => {
         const [postData, profileData, followingData] = await Promise.all([
           localforage.getItem(`posts_${userData.id}`),
           localforage.getItem(`User_Profile_${userData.id}`),
-          localforage.getItem(`Following_state_${userData.id}`),
+          localforage.getItem(`Following_state_${userData.id}`)
         ]);
         if (userData) setUser(userData);
+        setEditData(userData);
         if (profileData?.image) setImage(profileData.image);
         if (postData) {
           const myPosts = postData.filter(
@@ -33,6 +37,7 @@ const Profile = () => {
           ).length;
           setFollowingCount(count);
         }
+
       } catch (error) {
         console.log("Failed to load the data", error);
       }
@@ -43,7 +48,10 @@ const Profile = () => {
     try {
       const file = e.target.files[0];
       if (!file) return;
-
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image size should be less than 2MB");
+        return;
+      }
       setImage(URL.createObjectURL(file));
 
       const base64Image = await new Promise((resolve, reject) => {
@@ -73,100 +81,123 @@ const Profile = () => {
       console.error("Failed to delete post", error);
     }
   };
+  const handleEditUserDetails = async () => {
+    try {
+      const updatedUser = {
+        ...user,
+        ...editData
+      };
+      await localforage.setItem("Current_user", updatedUser);
+      setUser(updatedUser);
+      setIsEditing(false)
+    } catch (error) {
+      console.log("Failed to update the user details", error);
+      throw new Error("Failed to update the user details", error);
+    }
+  };
   return (
-    <div className="min-h-screen bg-gray-100 flex items-start py-10 gap-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">
-          {user.firstName}'s Profile
-        </h1>
-
-        <label className="cursor-pointer inline-block relative mb-8">
+    <div className="min-h-screen bg-gray-100 flex">
+      {/* SIDEBAR */}
+      <div className="w-full md:w-80 bg-white border-r p-6 flex flex-col items-center">
+        <label className="relative cursor-pointer group">
           <img
             src={
               image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"
             }
-            alt="user-image"
-            className="w-40 h-40 rounded-full object-cover shadow-lg hover:opacity-90 transition"
+            className="w-28 h-28 rounded-full object-cover shadow-md"
           />
-          <input
-            type="file"
-            className="hidden"
-            onChange={handleSaveProfile}
-            accept="image/*"
-          />
+          <input type="file" className="hidden" onChange={handleSaveProfile} />
+
+          <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs">
+            Upload
+          </div>
         </label>
 
-        <div className="space-y-4 text-left">
-          <div className="bg-gray-50 rounded-xl px-4 py-3">
-            <p className="text-sm text-gray-500">Username</p>
-            <h3 className="text-lg font-semibold text-gray-800">
-              {user.firstName + " " + user.lastName}
-            </h3>
+        {/* Name */}
+        <h2 className="mt-4 text-xl font-semibold text-gray-900">
+          {user.firstName} {user.lastName}
+        </h2>
+        <p className="text-sm text-gray-500">{user.email}</p>
+
+        {/* Stats */}
+        <div className="mt-6 w-full space-y-3">
+          <div className="flex justify-between bg-gray-50 px-4 py-2 rounded-lg">
+            <span className="text-gray-500 text-sm">Posts</span>
+            <span className="font-semibold">{posts.length}</span>
           </div>
 
-          <div className="bg-gray-50 rounded-xl px-4 py-3">
-            <p className="text-sm text-gray-500">Email</p>
-            <h3 className="text-lg font-semibold text-gray-800">
-              {user.email}
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="bg-indigo-50 rounded-xl py-4 flex flex-col items-center">
-              <span className="text-sm text-gray-500">Following</span>
-              <h3 className="text-xl font-bold text-indigo-600">
-                {followingCount}
-              </h3>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="flex flex-col items-center bg-amber-500 rounded-xl py-4">
-              <span className="text-sm text-gray-800">Posts</span>
-              <h3 className="text-lg font-semibold text-gray-900">
-                {posts.length}
-              </h3>
-            </div>
-            <div className="flex flex-col items-center bg-cyan-500 rounded-xl py-4">
-              <span className="text-sm text-gray-800">Likes</span>
-              <h3 className="text-lg font-semibold text-gray-900">0</h3>
-            </div>
+          <div className="flex justify-between bg-gray-50 px-4 py-2 rounded-lg">
+            <span className="text-gray-500 text-sm">Following</span>
+            <span className="font-semibold">{followingCount}</span>
           </div>
         </div>
-      </div>
-      <div className="w-full md:w-2/3 bg-white rounded-3xl shadow-lg p-6 md:p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            All Posts
-          </h1>
-          <span className="text-sm text-gray-500">{posts.length} items</span>
-        </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {posts.map((post) => {
-            return (
-              <div
-                key={post.id}
-                className="relative group rounded-xl overflow-hidden bg-gray-100 aspect-square"
+        <Button
+          className="mt-6 w-full bg-gray-900 text-white py-2 rounded-lg text-sm hover:bg-gray-800 transition"
+          onClick={() => {
+            setEditData(user);
+            setIsEditing(true);
+          }}
+        >
+          Edit Profile
+        </Button>
+        {isEditing && (
+          <Modal
+            title="Edit Profile"
+            isOpen={isEditing}
+            onClose={() => {setIsEditing(false); setEditData(user)} }
+          >
+            <div className="p-6 space-y-4">
+              <Input
+                placeholder="First Name"
+                value={editData.firstName || ''}
+                onChange={(e) =>
+                  setEditData({ ...editData, firstName: e.target.value })
+                }
+              />
+              <Input
+                placeholder="Last Name"
+                value={editData.lastName || ''}
+                onChange={(e) =>
+                  setEditData({ ...editData, lastName: e.target.value })
+                }
+              />
+              <Button
+                className="w-full bg-gray-900 text-white py-2 rounded-lg text-sm hover:bg-gray-800 transition"
+                onClick={handleEditUserDetails}
               >
-                <img
-                  src={post.image}
-                  alt=""
-                  className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                />
+                Save Changes
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </div>
+      <div className="flex-1 p-6 md:p-10">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Your Posts</h1>
+          <span className="text-sm text-gray-500">{posts.length} total</span>
+        </div>
 
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300" />
-
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <Button
-                    onClick={() => handleDelete(post.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-lg shadow-md"
-                  >
-                    Delete
-                  </Button>
-                </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+          {posts.map((post) => (
+            <div
+              key={post.id}
+              className="relative rounded-xl overflow-hidden group bg-gray-200"
+            >
+              <img
+                src={post.image}
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+              />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                <Button
+                  onClick={() => handleDelete(post.id)}
+                  className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600"
+                >
+                  Delete
+                </Button>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </div>
