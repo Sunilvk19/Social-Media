@@ -22,6 +22,21 @@
       "id": "-iUJwwYOVhM"
     }
   ],
-  "messages": [],
+  "messages": [
+    {
+      "id": "c14a",
+      "text": "Hiii",
+      "senderId": "user_0ocvsfw_1776841208708",
+      "receiverId": "BjaLfb8xc6Q",
+      "timestamp": "2026-04-22T11:48:23.929Z"
+    },
+    {
+      "id": "e3cb",
+      "text": "Hello",
+      "senderId": "BjaLfb8xc6Q",
+      "receiverId": "user_0ocvsfw_1776841208708",
+      "timestamp": "2026-04-22T11:48:52.376Z"
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

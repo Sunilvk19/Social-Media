@@ -276,7 +276,7 @@ const Home = () => {
                         <div className="flex items-center gap-3 w-full min-w-0 pr-2">
                           <div className="relative w-11 h-11 shrink-0">
                             <img
-                              src={user.image}
+                              src={user.image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
                               alt="User"
                               className="w-full h-full rounded-full object-cover border border-gray-100 shadow-sm transition-transform duration-300 group-hover:scale-105"
                             />
@@ -286,7 +286,7 @@ const Home = () => {
                               {user.firstName} {user.lastName}
                             </span>
                             <span className="text-[12px] text-gray-500 font-medium truncate">
-                              @{user.username}
+                              @{user.username || user.firstName}
                             </span>
                           </div>
                         </div>
