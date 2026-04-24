@@ -32,9 +32,9 @@ const Chat = () => {
         
         setFollowedUsers(followed);
 
-        if (followed.length > 0) {
-          setSelectedUser(followed[0]);
-        }
+        // if (followed.length > 0) {
+        //   setSelectedUser(followed[0]);
+        // }
       } catch (error) {
         console.error("Error initializing chat:", error);
       } finally {

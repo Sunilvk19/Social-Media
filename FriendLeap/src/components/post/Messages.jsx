@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Input from "../common/Input";
 import Button from "../common/Button";
 import { faMessage } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Messages = ({ 
   currentUser, 
@@ -57,7 +58,7 @@ const Messages = ({
             ))
           ) : (
             <div className="p-10 text-center">
-              <p className="text-gray-400 text-sm">Follow someone on the Home page to start a chat!</p>
+              <p className="text-gray-400 text-sm">Follow someone to start a chat!</p>
             </div>
           )}
         </div>
