@@ -2,7 +2,7 @@ import { BASE_URL, END_POINTS } from "../utility/Api";
 import axios from "axios";
 
 export const getMockUsers = async () => {
-    const url = `${BASE_URL}${END_POINTS.GET_USER}`; 
+    const url = `${BASE_URL}${END_POINTS.GET_USER}?limit=100`; 
     try {
         const res = await axios.get(url);
         return res.data;
