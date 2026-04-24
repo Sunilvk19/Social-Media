@@ -25,6 +25,7 @@ const Navbar = () => {
   const handleNotification = ()=>{
     setNotification(!notification);
   }
+
   const handleLogoutClick = async () => {
     try {
       await handleLogout();
@@ -33,14 +34,17 @@ const Navbar = () => {
       throw new Error(err);
     }
   };
+
   const navLinks = [
     { name: "Home", path: "/home" },
     { name: "Explore", path: "/explore" },
     { name: "Messages", path: "/messages" },
   ];
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   }
+  
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">

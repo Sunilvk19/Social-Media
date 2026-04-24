@@ -36,6 +36,27 @@
       "senderId": "BjaLfb8xc6Q",
       "receiverId": "user_0ocvsfw_1776841208708",
       "timestamp": "2026-04-22T11:48:52.376Z"
+    },
+    {
+      "id": "d13d",
+      "text": "hii",
+      "senderId": "BjaLfb8xc6Q",
+      "receiverId": "user_0ocvsfw_1776841208708",
+      "timestamp": "2026-04-23T11:39:59.097Z"
+    },
+    {
+      "id": "1a9d",
+      "text": "hello",
+      "senderId": "BjaLfb8xc6Q",
+      "receiverId": 1,
+      "timestamp": "2026-04-23T11:40:16.573Z"
+    },
+    {
+      "id": "c900",
+      "text": "Hii",
+      "senderId": "BjaLfb8xc6Q",
+      "receiverId": 1,
+      "timestamp": "2026-04-23T11:40:50.423Z"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
