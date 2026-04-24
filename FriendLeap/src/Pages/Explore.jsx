@@ -105,9 +105,6 @@ const Explore = () => {
                     <span className="text-sm font-bold text-gray-800">
                       {user.firstName} {user.lastName}
                     </span>
-                    {/* <span className="text-xs font-semibold text-gray-500">
-                      @{user.username}
-                    </span> */}
                     <span>
                       {user.followers} 
                     </span>

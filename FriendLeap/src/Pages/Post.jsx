@@ -2,12 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Button from "../components/common/Button";
 import localforage from "localforage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faImage,
-  faXmark,
-  faVideo,
-  faSmile,
-} from "@fortawesome/free-solid-svg-icons";
+import { faImage, faXmark } from "@fortawesome/free-solid-svg-icons";
 import Input from "../components/common/Input";
 
 function Post({ onPostCreated }) {
@@ -41,7 +36,7 @@ function Post({ onPostCreated }) {
             });
             resolve({
               file: optimizedFile,
-              url: URL.createObjectURL(optimizedFile),
+              url: URL.createObjectURL(optimizedFile),   
             });
           },
           "image/jpeg",

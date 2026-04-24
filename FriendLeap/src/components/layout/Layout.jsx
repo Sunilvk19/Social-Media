@@ -3,7 +3,7 @@ import Navbar from './Navbar'
 
 const Layout = ({ children, isChat = false }) => {
   return (
-    <div>
+    <div className=''>
       {!isChat && <Navbar />}
       <main>{children}</main>
     </div>
