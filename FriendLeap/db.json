@@ -31,32 +31,25 @@
   ],
   "messages": [
     {
-      "id": "c14a",
-      "text": "Hiii",
-      "senderId": "user_0ocvsfw_1776841208708",
-      "receiverId": "BjaLfb8xc6Q",
-      "timestamp": "2026-04-22T11:48:23.929Z"
-    },
-    {
-      "id": "e3cb",
-      "text": "Hello",
+      "text": "hi",
       "senderId": "BjaLfb8xc6Q",
-      "receiverId": "user_0ocvsfw_1776841208708",
-      "timestamp": "2026-04-22T11:48:52.376Z"
-    },
-    {
-      "text": "hey, how are you ?",
-      "senderId": "BjaLfb8xc6Q",
-      "receiverId": "user_0ocvsfw_1776841208708",
-      "timestamp": "2026-04-23T05:41:29.796Z",
-      "id": "6MmCzGoA5Q0"
+      "receiverId": "_IAI1MNOgrI",
+      "timestamp": "2026-04-24T09:18:49.871Z",
+      "id": "b5yxDybwSSs"
     },
     {
       "text": "hi",
       "senderId": "BjaLfb8xc6Q",
       "receiverId": "user_0ocvsfw_1776841208708",
-      "timestamp": "2026-04-23T07:26:39.589Z",
-      "id": "o0EfhFozh6g"
+      "timestamp": "2026-04-24T09:37:26.073Z",
+      "id": "oWPYzZEkn3U"
+    },
+    {
+      "text": "hello",
+      "senderId": "BjaLfb8xc6Q",
+      "receiverId": "-iUJwwYOVhM",
+      "timestamp": "2026-04-24T09:37:32.907Z",
+      "id": "of1cg0UPMB4"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

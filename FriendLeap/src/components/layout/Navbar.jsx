@@ -7,7 +7,6 @@ import {
   faXmark,
   faBars,
   faMagnifyingGlass,
-  faCirclePlus,
 } from "@fortawesome/free-solid-svg-icons";
 import Input from "../common/Input";
 import Button from "../common/Button";
@@ -31,7 +30,7 @@ const Navbar = () => {
       await handleLogout();
       navigate("/");
     } catch (err) {
-      throw new Error(err);
+      console.error(err);
     }
   };
 
@@ -47,25 +46,25 @@ const Navbar = () => {
   
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
+      <nav className="fixed top-0 left-0 w-full z-50 bg-[#0f0a19]/60 backdrop-blur-xl border-b border-white/5 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between gap-4">
           <Link
             to="/home"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0"
           >
-            <img src={image} alt="logo" className="w-12 h-12 rounded-2xl" />
-            <span className="text-2xl font-black bg-clip-text text-transparent bg-linear-to-r from-cyan-500 via-blue-500 to-purple-500 tracking-tighter hidden sm:block drop-shadow-sm">
-              FriendLeap
+            <img src={image} alt="logo" className="w-10 h-10 rounded-xl" />
+            <span className="text-2xl font-black text-white tracking-tighter hidden sm:block">
+              Friend<span className="text-cyan-400">Leap</span>
             </span>
           </Link>
 
-          <ul className="hidden md:flex items-center justify-center gap-6 lg:gap-8 text-sm font-medium text-gray-600 whitespace-nowrap">
+          <ul className="hidden md:flex items-center justify-center gap-8 text-sm font-bold text-white/50 whitespace-nowrap">
             {navLinks.map((item) => {
               const isActive = location.pathname.startsWith(item.path);
               return (
                 <li
                   key={item.name}
-                  className={`font-bold transition-colors ${isActive ? "text-cyan-600" : "text-gray-600 hover:text-orange-600"}`}
+                  className={`transition-colors ${isActive ? "text-cyan-400" : "hover:text-white"}`}
                 >
                   <Link to={item.path} className="py-2 inline-block">
                     {item.name}
@@ -74,99 +73,88 @@ const Navbar = () => {
               );
             })}
           </ul>
-          <div className="flex items-center justify-end gap-2 sm:gap-3 shrink-0">
-            <Input
-              containerClassName="hidden lg:block w-[180px] xl:w-[220px]"
-              icon={faMagnifyingGlass}
-              onChange={handleSearchChange}
-              type="text"
-              placeholder="Search..."
-              className="pl-10 pr-4 py-2 w-full bg-gray-50 border border-gray-200 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all shadow-inner"
-            />
-            <div className="relative">
-              {notification && (<span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full z-10" />)}
-              <Button
-                icon={faBell}
-                variant={"ghost"}
-                size="sm"
-                onClick={handleNotification}
-                aria-label="Notifications"
-                className="relative p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors focus:outline-none"
+          
+          <div className="flex items-center justify-end gap-3 shrink-0">
+            <div className="relative hidden lg:block">
+              <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 text-sm" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search moments..."
+                className="pl-10 pr-4 py-2.5 w-[240px] bg-white/5 border border-white/5 text-sm text-white rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:bg-white/10 transition-all"
               />
             </div>
 
-            <div className="h-8 w-px bg-gray-200 hidden sm:block"></div>
+            <div className="relative">
+              <button
+                onClick={handleNotification}
+                className={`p-2.5 rounded-full transition-all ${notification ? "text-cyan-400 bg-cyan-400/10" : "text-white/40 hover:text-white hover:bg-white/5"}`}
+              >
+                <FontAwesomeIcon icon={faBell} />
+                {notification && <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#0f0a19]" />}
+              </button>
+            </div>
+
+            <div className="h-6 w-px bg-white/10 hidden sm:block"></div>
 
             <div className="relative">
-              <Button
-                icon={faUser}
-                variant={"ghost"}
-                size="sm"
-                className="hover:bg-gray-100 cursor-pointer rounded-full"
-                label={"profile"}
+              <button
+                className="flex items-center gap-2.5 px-4 py-2 rounded-full text-white/50 hover:text-white hover:bg-white/5 transition-all font-bold text-sm"
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-              />
+              >
+                <FontAwesomeIcon icon={faUser} />
+                <span className="hidden sm:inline">profile</span>
+              </button>
 
               {isProfileOpen && (
-                <div className="absolute right-0 z-10 mt-2 flex flex-col w-48 py-1 bg-white rounded-lg shadow-lg border border-gray-100 cursor-pointer">
+                <div className="absolute right-0 mt-3 w-56 p-2 bg-[#1b1429] border border-white/10 rounded-[24px] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                   <Link
-                    to={"/profile"}
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                    to="/profile"
+                    className="block px-5 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-2xl font-bold transition-all"
+                    onClick={() => setIsProfileOpen(false)}
                   >
                     Profile
                   </Link>
                   <Link
-                    to={"/setting"}
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                    to="/setting"
+                    className="block px-5 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-2xl font-bold transition-all"
+                    onClick={() => setIsProfileOpen(false)}
                   >
-                    Setting
+                    Settings
                   </Link>
-                  <Button
+                  <div className="h-px bg-white/5 my-2"></div>
+                  <button
                     onClick={handleLogoutClick}
-                    className="w-full text-center block bg-red-500 text-white font-semibold mt-2 mx-1 px-4 py-1 rounded-md transition-colors"
+                    className="w-full text-left px-5 py-3 text-rose-400 hover:bg-rose-400/10 rounded-2xl font-bold transition-all"
                   >
                     Logout
-                  </Button>
+                  </button>
                 </div>
               )}
             </div>
 
-            <Button
-              className="md:hidden p-2 text-gray-500 hover:text-indigo-600 focus:outline-none"
+            <button
+              className="md:hidden p-2 text-white/50 hover:text-white"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              {isMobileMenuOpen ? (
-                <FontAwesomeIcon icon={faXmark} size="lg" />
-              ) : (
-                <FontAwesomeIcon icon={faBars} />
-              )}
-            </Button>
+              <FontAwesomeIcon icon={isMobileMenuOpen ? faXmark : faBars} size="lg" />
+            </button>
           </div>
         </div>
 
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 shadow-lg px-6 py-4 space-y-4">
-            <Input
-              containerClassName="sm:hidden"
-              icon={faMagnifyingGlass}
-              type="text"
-              placeholder="Search FriendLeap..."
-              className="pl-10 pr-4 py-2 w-full bg-gray-50 border border-gray-200 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all shadow-inner"
-            />
-
-            <ul className="flex flex-col gap-3 text-sm font-medium text-gray-600">
+          <div className="md:hidden bg-[#0f0a19] border-t border-white/5 p-6 animate-in slide-in-from-top duration-300">
+            <ul className="flex flex-col gap-2">
               {navLinks.map((item) => {
                 const isActive = location.pathname.startsWith(item.path);
-
                 return (
                   <li key={item.name}>
                     <Link
                       to={item.path}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`transition-colors block rounded-md px-3 py-2 font-medium ${
-                        isActive
-                          ? "text-green-600 bg-indigo-50 font-semibold"
-                          : "hover:text-red-600 hover:bg-gray-50"
+                      className={`block px-5 py-4 rounded-2xl font-bold transition-all ${
+                        isActive ? "text-cyan-400 bg-cyan-400/5" : "text-white/50 hover:text-white hover:bg-white/5"
                       }`}
                     >
                       {item.name}
@@ -177,9 +165,8 @@ const Navbar = () => {
             </ul>
           </div>
         )}
-
       </nav>
-      <div className="h-[73px]"></div>
+      <div className="h-[76px]"></div>
     </>
   );
 };

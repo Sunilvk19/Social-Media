@@ -124,22 +124,18 @@ const Profile = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      <div className="w-full md:w-80 bg-white border-r p-6 flex flex-col items-center">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-indigo-900 to-blue-900 text-white p-6">
+      <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 flex justify-between items-center border border-white/10">
         <label className="relative cursor-pointer group">
           <img
             src={
               image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"
             }
-            className="w-28 h-28 rounded-full object-cover shadow-md"
+            className="w-16 h-16 rounded-xl object-cover"
           />
-          <input type="file" className="hidden" onChange={handleSaveProfile} />
-
-          <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs">
-            Upload
-          </div>
+          <Input type="file" className="hidden" onChange={handleSaveProfile} />
         </label>
-        <h2 className="mt-4 text-xl font-semibold text-gray-900">
+        <h2 className="text-2xl">
           {user.firstName} {user.lastName}
         </h2>
         <p className="text-sm text-gray-500">{user.email}</p>
