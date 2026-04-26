@@ -4,9 +4,19 @@ import { getRealUsers } from "../services/User";
 
 import Button from "../components/common/Button";
 import Post from "./Post";
+import PostCard from "../components/post/PostCard";
+import MoodFilter from "../components/post/MoodFilter";
+import TrendingSidebar from "../components/layout/TrendingSidebar";
 import localforage from "localforage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faHeart, faTimes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCompass,
+  faFire,
+  faUsers,
+  faStar,
+  faUser,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
@@ -15,10 +25,10 @@ const Home = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
-  const [count, setCount] = useState(6);
   const [isFollowing, setIsFollowing] = useState({});
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [showFollowingModal, setShowFollowingModal] = useState(false);
+  const [activeMood, setActiveMood] = useState("all");
 
   const Icons = {
     Zap: ({ className, fill = "none" }) => (
@@ -34,10 +44,10 @@ const Home = () => {
           if (post.id === id) {
             if (newSet.has(id)) {
               newSet.delete(id);
-              return { ...post, like: post.like - 1 };
+              return { ...post, like: (post.like || 0) - 1 };
             } else {
               newSet.add(id);
-              return { ...post, like: post.like + 1 };
+              return { ...post, like: (post.like || 0) + 1 };
             }
           }
           return post;
@@ -62,7 +72,10 @@ const Home = () => {
     const fetchUsersData = async () => {
       try {
         const userData = await localforage.getItem("Current_user");
-        if (!userData) return;
+        if (!userData) {
+          navigate("/login");
+          return;
+        }
         setCurrentUser(userData);
 
         const [mockPosts, mockUsers, realUsers] = await Promise.all([
@@ -73,7 +86,7 @@ const Home = () => {
 
         const totalUsers = [...realUsers, ...mockUsers.users];
         setUsers(totalUsers);
-        
+
         const localPosts = await localforage.getItem(`posts_${userData.id}`);
         if (localPosts) {
           setPosts(localPosts);
@@ -84,13 +97,13 @@ const Home = () => {
             await localforage.setItem(`posts_${userData.id}`, postsRes.posts);
           }
         }
-        
+
         const [followingData, userProfile, likedData] = await Promise.all([
           localforage.getItem(`Following_state_${userData.id}`),
           localforage.getItem(`User_Profile_${userData.id}`),
           localforage.getItem(`liked_posts_${userData.id}`),
         ]);
-        
+
         if (userProfile?.image) {
           setCurrentUser((prev) => ({
             ...prev,
@@ -106,7 +119,7 @@ const Home = () => {
       }
     };
     fetchUsersData();
-  }, []);
+  }, [navigate]);
 
   const handleNewPost = (newPost) => {
     setPosts((prev) => {
@@ -116,223 +129,152 @@ const Home = () => {
     });
   };
 
-  const filteredUsers = users.filter((user) =>
-    user.id !== currentUser.id && !isFollowing[user.id]);
+  const filteredFeed = posts
+    ?.filter((post) => post.userId === currentUser.id || isFollowing[post.userId])
+    .filter((post) => activeMood === "all" || post.mood === activeMood);
 
-  const followingUsersList = users.filter((user) => isFollowing[user.id]);
-
-  const handleSuggestion = () => {
-    setCount((prev) => {
-      const next = prev + 4;
-      return next >= filteredUsers.length ? filteredUsers.length : next;
-    });
-  };
-
-  const fetchFeed = posts?.filter((post) => {
-    return post.userId === currentUser.id || isFollowing[post.userId];
-  });
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0f0a19]">
+        <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-white font-sans">
-      {loading && <div className="flex items-center justify-center h-screen text-purple-500 font-bold">Loading leaps...</div>}
-      
-      {!loading && (
-        <div className="max-w-7xl mx-auto px-6 pt-8 pb-10">
-          
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
-              Your Feed
-            </h1>
-            <div className="flex items-center gap-2 bg-[#1c1c2d] px-4 py-2 rounded-full border border-gray-800">
-              <div className="bg-purple-600 p-1 rounded-lg"><Icons.Zap fill="white" /></div>
-              <span className="font-bold">FriendLeap</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-10">
+    <div className="min-h-screen pt-12 pb-20 px-4 md:px-8 max-w-[1600px] mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_350px] gap-8">
+        
+        {/* Left Column: Profile & Nav */}
+        <aside className="hidden lg:flex flex-col gap-6 animate-in slide-in-from-left-8 duration-700">
+          <div className="glass-card rounded-[40px] p-8 relative overflow-hidden group">
+            {/* Background Glow */}
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full"></div>
             
-            <div className="hidden lg:block w-72 shrink-0">
-              <div className="bg-[#161b22] rounded-3xl shadow-2xl border border-gray-800 overflow-hidden sticky top-8">
-                <div className="h-20 bg-gradient-to-r from-purple-600 to-blue-500"></div>
-                <div className="px-6 pb-6 relative">
-                  <div className="flex justify-center -mt-12 mb-4">
-                    <div className="w-20 h-20 rounded-2xl border-4 border-[#161b22] bg-[#0d1117] overflow-hidden shadow-xl">
-                      {currentUser?.image ? (
-                        <img
-                          src={currentUser.image}
-                          alt="Profile"
-                          className="w-full h-full object-cover hover:scale-110 transition-transform cursor-pointer"
-                          onClick={() => navigate("/profile")}
-                        />
-                      ) : (
-                        <div 
-                          className="w-full h-full bg-purple-500 flex items-center justify-center text-2xl font-bold cursor-pointer"
-                          onClick={() => navigate("/profile")}
-                        >
-                          {currentUser?.firstName?.charAt(0) || "U"}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-center mb-6">
-                    <h2 className="font-bold text-lg text-gray-100">
-                      {currentUser?.firstName} {currentUser?.lastName}
-                    </h2>
-                    <p className="text-gray-500 text-xs">@{currentUser?.username || 'user'}</p>
-                  </div>
-                  
-                  <div className="flex justify-around border-t border-gray-800 pt-4">
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-purple-400">{posts.filter(p => p.userId === currentUser.id).length}</p>
-                      <p className="text-[10px] uppercase tracking-widest text-gray-500">Leaps</p>
-                    </div>
-                    <button onClick={() => setShowFollowingModal(true)} className="text-center hover:opacity-80 transition-opacity">
-                      <p className="text-lg font-bold text-blue-400">{Object.values(isFollowing).filter(v => v === true).length}</p>
-                      <p className="text-[10px] uppercase tracking-widest text-gray-500">Sparks</p>
-                    </button>
-                  </div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 rounded-full bg-linear-to-tr from-rose-400 to-pink-500 flex items-center justify-center overflow-hidden shadow-lg border-2 border-white/10">
+                  {currentUser?.image ? (
+                    <img src={currentUser.image} alt="Me" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-3xl">🚀</div>
+                  )}
+                </div>
+                <div className="flex flex-col truncate">
+                  <h2 className="text-xl font-black text-white truncate">
+                    {currentUser?.firstName || "Sunil"}
+                  </h2>
+                  <p className="text-white/30 text-sm font-bold truncate">
+                    @{currentUser?.username || "you"}.leap
+                  </p>
                 </div>
               </div>
-            </div>
 
-            {/* Main Content: Feed */}
-            <div className="flex-1 max-w-2xl space-y-6">
-              <div className="bg-[#161b22] border border-gray-800 rounded-3xl p-2 shadow-lg">
-                <Post onPostCreated={handleNewPost} />
-              </div>
-
-              <div className="space-y-6">
-                {fetchFeed?.map((post) => (
-                  <div key={post.id} className="bg-[#161b22] rounded-3xl border border-gray-800 p-6 shadow-md hover:border-gray-700 transition-colors">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full border border-gray-700 bg-gray-800 overflow-hidden">
-                        {post?.authorImage ? (
-                          <img src={post.authorImage} alt="User" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-sm font-bold text-white bg-gradient-to-br from-purple-500 to-blue-500">
-                            {post?.authorName?.charAt(0) || "U"}
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-sm text-gray-100">{post.authorName || "User"}</h3>
-                        <p className="text-[10px] text-gray-500">Just now</p>
-                      </div>
-                    </div>
-
-                    <p className="text-gray-300 font-medium mb-4">{post.name}</p>
-
-                    {post.image && post.image.startsWith("data:video/") ? (
-                      <video src={post.image} controls className="w-full max-h-96 rounded-2xl object-cover mb-4 bg-black border border-gray-800" />
-                    ) : post.image ? (
-                      <img src={post.image} alt="post" className="w-full h-auto rounded-2xl object-cover mb-4 border border-gray-800" />
-                    ) : null}
-
-                    <div className="flex items-center gap-4 pt-2">
-                      <button
-                        onClick={() => handleLike(post.id)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                          likedPosts.has(post.id) ? "bg-pink-500/10 text-pink-500" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                        }`}
-                      >
-                        <FontAwesomeIcon icon={faHeart} />
-                        {post.like || 0}
-                      </button>
-                      <button className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-gray-800 text-gray-400 hover:bg-gray-700 transition-all">
-                        <FontAwesomeIcon icon={faComment} />
-                        Discuss
-                      </button>
-                    </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: "Leaps", value: posts.filter(p => p.userId === currentUser?.id).length },
+                  { label: "Friends", value: Object.values(isFollowing).filter(v => v === true).length, onClick: () => setShowFollowingModal(true) },
+                  { label: "Sparks", value: 0 }
+                ].map((stat, i) => (
+                  <div 
+                    key={i} 
+                    onClick={stat.onClick}
+                    className={`bg-white/5 rounded-[24px] py-4 flex flex-col items-center justify-center transition-all hover:bg-white/10 ${stat.onClick ? "cursor-pointer" : ""}`}
+                  >
+                    <span className="text-xl font-black text-white">{stat.value}</span>
+                    <span className="text-[9px] font-black text-white/20 uppercase tracking-widest mt-1">{stat.label}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Right Sidebar: Suggestions */}
-            <div className="hidden xl:block w-72 shrink-0">
-              <div className="bg-[#161b22] rounded-3xl border border-gray-800 p-5 sticky top-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500">Discover</h2>
-                  <button onClick={handleSuggestion} className="text-xs font-bold text-purple-400 hover:text-purple-300 transition-colors">
-                    Refresh
-                  </button>
-                </div>
-                <div className="flex flex-col gap-5">
-                  {filteredUsers.slice(0, count).map((user) => (
-                    <div key={user.id} className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 truncate">
-                        <img 
-                           src={user.image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} 
-                           className="w-10 h-10 rounded-xl object-cover border border-gray-800" 
-                           alt="User" 
-                        />
-                        <div className="truncate">
-                          <p className="text-xs font-bold text-gray-200 truncate">{user.firstName} {user.lastName}</p>
-                          <p className="text-[10px] text-gray-500">@{user.username || 'user'}</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleFollowing(user.id)}
-                        className={`shrink-0 px-3 py-1 rounded-full text-[10px] font-bold transition-all border ${
-                          isFollowing[user.id] 
-                            ? "bg-transparent border-gray-700 text-gray-500" 
-                            : "bg-white text-black border-white hover:bg-gray-200"
-                        }`}
-                      >
-                        {isFollowing[user.id] ? "Following" : "Follow"}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
           </div>
-        </div>
-      )}
 
-      {/* Modal matching Profile theme */}
+          <nav className="glass-card rounded-[40px] p-4 flex flex-col gap-1">
+            {[
+              { icon: faCompass, label: "Discover", color: "text-cyan-400" },
+              { icon: faFire, label: "Trending", color: "text-orange-500" },
+              { icon: faUsers, label: "Circle", color: "text-indigo-400" },
+              { icon: faStar, label: "Saved Sparks", color: "text-amber-400" },
+              { icon: faUser, label: "Your profile", onClick: () => navigate("/profile"), color: "text-rose-400" },
+            ].map((item, index) => (
+              <button
+                key={index}
+                onClick={item.onClick}
+                className="flex items-center gap-5 p-5 rounded-[28px] hover:bg-white/5 transition-all group w-full text-left"
+              >
+                <div className={`${item.color} text-xl group-hover:scale-125 transition-transform duration-300`}>
+                  <FontAwesomeIcon icon={item.icon} />
+                </div>
+                <span className="text-[17px] font-bold text-white/70 group-hover:text-white transition-colors">
+                  {item.label}
+                </span>
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Center Column: Feed */}
+        <main className="space-y-8 animate-in fade-in duration-1000">
+          <MoodFilter activeMood={activeMood} onMoodChange={setActiveMood} />
+          
+          <Post onPostCreated={handleNewPost} />
+
+          <div className="space-y-8">
+            {filteredFeed?.length > 0 ? (
+              filteredFeed.map((post) => (
+                <PostCard 
+                  key={post.id} 
+                  post={post} 
+                  onLike={handleLike} 
+                  isLiked={likedPosts.has(post.id)} 
+                />
+              ))
+            ) : (
+              <div className="text-center py-20 glass-card rounded-[40px]">
+                <div className="text-6xl mb-6">🌌</div>
+                <h3 className="text-2xl font-bold text-white mb-2">No leaps in this vibe yet</h3>
+                <p className="text-white/40">Be the first to share a moment!</p>
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Right Column: Trending */}
+        <aside className="hidden xl:block animate-in slide-in-from-right-8 duration-700">
+           <TrendingSidebar />
+        </aside>
+      </div>
+
+      {/* Following Modal */}
       {showFollowingModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
-          <div className="bg-[#161b22] border border-gray-800 rounded-3xl w-full max-w-md max-h-[70vh] overflow-hidden flex flex-col shadow-2xl">
-            <div className="p-6 border-b border-gray-800 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-white">Your Network</h2>
-              <button 
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="glass-card rounded-[40px] w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="p-8 border-b border-white/5 flex justify-between items-center">
+              <h2 className="text-2xl font-black text-white">Friends</h2>
+              <button
                 onClick={() => setShowFollowingModal(false)}
-                className="text-gray-500 hover:text-white transition-colors"
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/50 transition-colors"
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
             </div>
-            
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {followingUsersList.length > 0 ? (
-                followingUsersList.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 bg-[#0d1117] rounded-2xl border border-gray-800/50">
-                    <div className="flex items-center gap-3">
-                      <img 
-                        src={user.image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} 
-                        className="w-10 h-10 rounded-full object-cover border border-gray-800"
-                        alt={user.firstName}
-                      />
-                      <div>
-                        <p className="font-bold text-gray-200 text-sm">{user.firstName} {user.lastName}</p>
-                        <p className="text-[10px] text-gray-500 font-medium">@{user.username || 'user'}</p>
-                      </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {users.filter(u => isFollowing[u.id]).map((user) => (
+                <div key={user.id} className="flex items-center justify-between p-4 bg-white/5 rounded-[30px]">
+                  <div className="flex items-center gap-4">
+                    <img src={user.image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} className="w-12 h-12 rounded-full object-cover border border-white/10" alt={user.firstName} />
+                    <div>
+                      <p className="font-bold text-white">{user.firstName} {user.lastName}</p>
+                      <p className="text-xs text-white/30">@{user.username || user.firstName.toLowerCase()}</p>
                     </div>
-                    <button 
-                      onClick={() => handleFollowing(user.id)}
-                      className="px-4 py-1.5 text-[10px] bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-900/50 rounded-full font-bold transition-all"
-                    >
-                      Unfollow
-                    </button>
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <p>Your leap network is empty.</p>
+                  <Button onClick={() => handleFollowing(user.id)} className="px-5 py-2 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white border-none rounded-full text-xs font-black">
+                    Unfollow
+                  </Button>
                 </div>
-              )}
+              ))}
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import axios from "axios";
 import localforage from "localforage";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Messages from "./Messages";
 import { getMockUsers } from "../../services/Mock"; 
 import { getRealUsers } from "../../services/User";
@@ -12,6 +12,7 @@ const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Initialize data on mount
   useEffect(() => {
     const loadChatData = async () => {
       try {
@@ -19,23 +20,31 @@ const Chat = () => {
         if (!user) return;
         setCurrentUser(user);
 
-        const followingState = (await localforage.getItem(`Following_state_${user.id}`)) || {};
-        
-        const [mockUsers, realUsers] = await Promise.all([
+        const [followingStateRaw, mockRes, realUsersData] = await Promise.all([
+          localforage.getItem(`Following_state_${user.id}`),
           getMockUsers(),
           getRealUsers(),
-        ])
+        ]);
 
-        const allUsers = [...realUsers, ...mockUsers.users] || [];
-
-        const followed = allUsers.filter((u) => followingState[u.id.toString()] === true);
+        const followingState = followingStateRaw || {};
+        const mockUsers = mockRes?.users || [];
+        const realUsers = Array.isArray(realUsersData) ? realUsersData : [];
         
-        setFollowedUsers(followed);
+        // Combine, filter duplicates, and remove self
+        const allUsers = [...realUsers, ...mockUsers];
+        const uniqueFollowed = allUsers.filter((u, i, self) => 
+          self.findIndex(t => t.id.toString() === u.id.toString()) === i && 
+          u.id.toString() !== user.id.toString() && 
+          followingState[u.id.toString()] === true
+        );
+        
+        const displayUsers = [...uniqueFollowed].reverse();
+        setFollowedUsers(displayUsers);
 
-        // if (followed.length > 0 ) {
-        //   setSelectedUser(followed[0]);
-        // }
-
+        // Only auto-select the first user if none is selected yet
+        if (displayUsers.length > 0 && !selectedUser) {
+          setSelectedUser(displayUsers[0]);
+        }
       } catch (error) {
         console.error("Error initializing chat:", error);
       } finally {
@@ -43,9 +52,10 @@ const Chat = () => {
       }
     };
     loadChatData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
-
+  // Optimized Polling (Server-side filtering)
   useEffect(() => {
     if (!currentUser || !selectedUser) return;
 
@@ -54,15 +64,18 @@ const Chat = () => {
 
     const fetchMessages = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/messages");
+        // Fetch only relevant messages using json-server filters for efficiency
+        const [sent, received] = await Promise.all([
+          axios.get(`http://localhost:5000/messages?senderId=${currentUser.id}&receiverId=${selectedUser.id}`),
+          axios.get(`http://localhost:5000/messages?senderId=${selectedUser.id}&receiverId=${currentUser.id}`)
+        ]);
         
         if (isMounted) {
-          const filteredChat = res.data.filter((m) => 
-            (m.senderId?.toString() === currentUser.id.toString() && m.receiverId?.toString() === selectedUser.id.toString()) ||
-            (m.senderId?.toString() === selectedUser.id.toString() && m.receiverId?.toString() === currentUser.id.toString())
+          // Combine and sort by timestamp
+          const combined = [...sent.data, ...received.data].sort((a, b) => 
+            new Date(a.timestamp) - new Date(b.timestamp)
           );
-
-          setMessages(filteredChat);
+          setMessages(combined);
         }
       } catch (error) {
         console.error("Fetch error:", error.message);
@@ -74,44 +87,45 @@ const Chat = () => {
     };
 
     fetchMessages();
-
-    return () => {
-      isMounted = false;
-      clearTimeout(timeoutId);
+    return () => { 
+      isMounted = false; 
+      clearTimeout(timeoutId); 
     };
   }, [currentUser, selectedUser]);
 
-  const handleSendMessage = async (text) => {
+  const handleSendMessage = useCallback(async (text) => {
     if (!text.trim() || !currentUser || !selectedUser) return;
 
     const newMessage = {
-      text: text,
+      text,
       senderId: currentUser.id,
-      receiverId: selectedUser.id, // Targeted message
+      receiverId: selectedUser.id,
       timestamp: new Date().toISOString(),
     };
 
     try {
       const res = await axios.post("http://localhost:5000/messages", newMessage);
+      // Immediately update local state for better responsiveness
       setMessages((prev) => [...prev, res.data]);
     } catch (er) {
       console.error("Send error:", er.message);
     }
-  };
+  }, [currentUser, selectedUser]);
 
-  const handleClearChat = async () => {
+  const handleClearChat = useCallback(async () => {
     if (!window.confirm("Clear this conversation?")) return;
     try {
-      for (const mes of messages) {
-        await axios.delete(`http://localhost:5000/messages/${mes.id}`);
-      }
+      // Parallel deletions for speed
+      await Promise.all(messages.map(mes => 
+        axios.delete(`http://localhost:5000/messages/${mes.id}`)
+      ));
       setMessages([]);
     } catch (error) {
       console.error("Clear error", error.message);
     }
-  };
+  }, [messages]);
 
-  if (loading) return <div className="p-10 text-center font-bold">Loading Conversations...</div>;
+  if (loading) return <div className="p-10 text-center font-bold text-gray-500">Loading Conversations...</div>;
 
   return (
     <Messages
