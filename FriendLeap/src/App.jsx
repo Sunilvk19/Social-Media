@@ -48,9 +48,7 @@ const App = () => {
         <Route
           path="/profile"
           element={
-            <Layout>
               <Profile />
-            </Layout>
           }
         />
       </Routes>

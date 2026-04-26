@@ -20,13 +20,6 @@
       "email": "maha@gmail.com",
       "password": "$2b$10$w94lNeHbvHTPOV8XVAZG3.iDUZf8HeuoY6LdBiniJPeLdgApiZ/x.",
       "id": "-iUJwwYOVhM"
-    },
-    {
-      "firstName": "Test",
-      "lastName": "User",
-      "email": "test@example.com",
-      "password": "$2b$10$kLUaATMw1OgyDzfozvVyTu1UGcyQCWy9nHwWtdodsCZySAiYZk.Re",
-      "id": "_IAI1MNOgrI"
     }
   ],
   "messages": [
@@ -36,27 +29,6 @@
       "senderId": "user_0ocvsfw_1776841208708",
       "receiverId": "BjaLfb8xc6Q",
       "timestamp": "2026-04-22T11:48:23.929Z"
-    },
-    {
-      "id": "e3cb",
-      "text": "Hello",
-      "senderId": "BjaLfb8xc6Q",
-      "receiverId": "user_0ocvsfw_1776841208708",
-      "timestamp": "2026-04-22T11:48:52.376Z"
-    },
-    {
-      "text": "hey, how are you ?",
-      "senderId": "BjaLfb8xc6Q",
-      "receiverId": "user_0ocvsfw_1776841208708",
-      "timestamp": "2026-04-23T05:41:29.796Z",
-      "id": "6MmCzGoA5Q0"
-    },
-    {
-      "text": "hi",
-      "senderId": "BjaLfb8xc6Q",
-      "receiverId": "user_0ocvsfw_1776841208708",
-      "timestamp": "2026-04-23T07:26:39.589Z",
-      "id": "o0EfhFozh6g"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
