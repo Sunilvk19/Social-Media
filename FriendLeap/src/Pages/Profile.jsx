@@ -1,8 +1,7 @@
-import { icon } from "@fortawesome/fontawesome-svg-core";
-import localforage from "localforage";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import localforage from "localforage";
 import Button from "../components/common/Button";
-import Input from "../components/common/Input";
 import Modal from "../components/common/Modal";
 import { getMockUsers } from "../services/Mock";
 import { getRealUsers } from "../services/User";
@@ -13,261 +12,194 @@ const Profile = () => {
   const [posts, setPosts] = useState([]);
   const [followingCount, setFollowingCount] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({});
+  const [editData, setEditData] = useState({ bio: "Leaping between moments, collecting good vibes." });
   const [followedUsers, setFollowedUsers] = useState([]);
   const [isFollowing, setIsFollowing] = useState({});
+  
+  const [selectedColor, setSelectedColor] = useState('bg-pink-500');
+
+  const navigate = useNavigate();
+
+  const colors = [
+    'bg-pink-500', 'bg-orange-400', 'bg-purple-500', 
+    'bg-teal-400', 'bg-blue-400', 'bg-yellow-400'
+  ];
+
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         const userData = await localforage.getItem("Current_user");
         if (!userData) return;
+
         const [postData, profileData, followingData, mockUsersRes, realUsersRes] = await Promise.all([
           localforage.getItem(`posts_${userData.id}`),
           localforage.getItem(`User_Profile_${userData.id}`),
           localforage.getItem(`Following_state_${userData.id}`),
           getMockUsers(),
-          getRealUsers().catch(() => []) // Handle case where json-server is not running
+          getRealUsers().catch(() => [])
         ]);
-        if (userData) setUser(userData);
-        setEditData(userData);
+
+        setUser(userData);
+        setEditData({ ...userData, bio: profileData?.bio || "Leaping between moments, collecting good vibes." });
         if (profileData?.image) setImage(profileData.image);
+        if (profileData?.color) setSelectedColor(profileData.color);
+
         if (postData) {
-          const myPosts = postData.filter(
-            (post) => post.userId === userData.id,
-          );
+          const myPosts = postData.filter((post) => post.userId === userData.id);
           setPosts(myPosts);
         }
-        
+
         const followingMap = followingData || {};
         setIsFollowing(followingMap);
-        
-        const count = Object.values(followingMap).filter(
-          (following) => following === true,
-        ).length;
-        setFollowingCount(count);
+        setFollowingCount(Object.values(followingMap).filter(v => v === true).length);
 
         const allUsers = [...(realUsersRes || []), ...(mockUsersRes?.users || [])];
-        if (allUsers.length > 0) {
-          const followed = allUsers.filter(u => followingMap[u.id] === true);
-          setFollowedUsers(followed);
-        }
+        setFollowedUsers(allUsers.filter(u => followingMap[u.id] === true));
 
       } catch (error) {
-        console.log("Failed to load the data", error);
+        console.error("Failed to load data", error);
       }
     };
     fetchProfileData();
   }, []);
-  const handleSaveProfile = async (e) => {
-    try {
-      const file = e.target.files[0];
-      if (!file) return;
-      if (file.size > 2 * 1024 * 1024) {
-        alert("Image size should be less than 2MB");
-        return;
-      }
-      setImage(URL.createObjectURL(file));
 
-      const base64Image = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (error) => reject(error);
-      });
-      setImage(base64Image);
-      await localforage.setItem(`User_Profile_${user.id}`, {
-        image: base64Image,
-        user,
-      });
-      console.log("Profile Picture saved Successfully !");
-    } catch (err) {
-      console.log("Failed to save the profile", err);
-      throw new Error("Failed to save the profile");
-    }
-  };
-  const handleDelete = async (id) => {
+  const handleUpdateProfile = async () => {
     try {
-      const existingPosts = (await localforage.getItem("posts")) || [];
-      const updatedPosts = existingPosts.filter((post) => post.id !== id);
-      await localforage.setItem("posts", updatedPosts);
-      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
-    } catch (error) {
-      console.error("Failed to delete post", error);
-    }
-  };
-  const handleEditUserDetails = async () => {
-    try {
-      const updatedUser = {
-        ...user,
-        ...editData
-      };
+      const updatedUser = { ...user, ...editData };
       await localforage.setItem("Current_user", updatedUser);
-      setUser(updatedUser);
-      setIsEditing(false)
-    } catch (error) {
-      console.log("Failed to update the user details", error);
-      throw new Error("Failed to update the user details", error);
-    }
-  };
-  const handleFollowing = async (id) => {
-    try {
-      setIsFollowing((prev) => {
-        const updated = { ...prev, [id]: !prev[id] };
-        localforage.setItem(`Following_state_${user.id}`, updated);
-        
-        const count = Object.values(updated).filter(v => v === true).length;
-        setFollowingCount(count);
-        return updated;
+      await localforage.setItem(`User_Profile_${user.id}`, {
+        image,
+        bio: editData.bio,
+        color: selectedColor
       });
-    } catch (err) {
-      console.error("Failed to follow/unfollow", err);
+      setUser(updatedUser);
+      setIsEditing(false);
+      alert("Profile updated!");
+    } catch (error) {
+      console.error("Update failed", error);
     }
   };
+
+  const Icons = {
+    Zap: ({ className, fill = "none" }) => (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" className={className}><path d="M4 14.89 14 3v9.11L20 9.11 10 21v-9.11Z"/></svg>
+    ),
+    Rocket: () => (
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>
+    )
+  };
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-900 via-indigo-900 to-blue-900 text-white p-6">
-      <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 flex justify-between items-center border border-white/10">
-        <label className="relative cursor-pointer group">
-          <img
-            src={
-              image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-            }
-            className="w-16 h-16 rounded-xl object-cover"
-          />
-          <Input type="file" className="hidden" onChange={handleSaveProfile} />
-        </label>
-        <h2 className="text-2xl">
-          {user.firstName} {user.lastName}
-        </h2>
-        <p className="text-sm text-gray-500">{user.email}</p>
-        <div className="mt-6 w-full space-y-3">
-          <div className="flex justify-between bg-gray-50 px-4 py-2 rounded-lg">
-            <span className="text-gray-500 text-sm">Posts</span>
-            <span className="font-semibold">{posts.length}</span>
-          </div>
-
-          <div className="flex justify-between bg-gray-50 px-4 py-2 rounded-lg">
-            <span className="text-gray-500 text-sm">Following</span>
-            <span className="font-semibold">{followingCount}</span>
+    <div className="min-h-screen bg-[#0d1117] text-white p-6 font-sans">
+      <div className="max-w-4xl mx-auto space-y-6">
+        
+        <div className="flex justify-between items-center mb-8">
+          <button onClick={() => navigate('/home')} className="text-gray-400 hover:text-white flex items-center gap-2">
+            <span>←</span> Back to leaps
+          </button>
+          <div className="flex items-center gap-2 bg-[#1c1c2d] px-4 py-2 rounded-full border border-gray-800">
+            <div className="bg-purple-600 p-1 rounded-lg"><Icons.Zap fill="white" /></div>
+            <span className="font-bold">FriendLeap</span>
           </div>
         </div>
 
-        <Button
-          className="mt-6 w-full bg-gray-900 text-white py-2 rounded-lg text-sm hover:bg-gray-800 transition"
-          onClick={() => {
-            setEditData(user);
-            setIsEditing(true);
-          }}
-        >
-          Edit Profile
-        </Button>
-        {isEditing && (
-          <Modal
-            title="Edit Profile"
-            isOpen={isEditing}
-            onClose={() => {setIsEditing(false); setEditData(user)} }
-          >
-            <div className="p-6 space-y-4">
-              <Input
-                placeholder="First Name"
-                value={editData.firstName || ''}
-                onChange={(e) =>
-                  setEditData({ ...editData, firstName: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Last Name"
-                value={editData.lastName || ''}
-                onChange={(e) =>
-                  setEditData({ ...editData, lastName: e.target.value })
-                }
-              />
-              <Button
-                className="w-full bg-gray-900 text-white py-2 rounded-lg text-sm hover:bg-gray-800 transition"
-                onClick={handleEditUserDetails}
-              >
-                Save Changes
-              </Button>
+        <div className="bg-[#161b22] border border-gray-800 rounded-3xl p-8 shadow-2xl">
+          <div className="flex flex-col md:flex-row gap-8">
+            <div className={`w-32 h-32 ${selectedColor} rounded-3xl flex items-center justify-center shadow-lg transition-all duration-500`}>
+              <Icons.Rocket />
             </div>
-          </Modal>
-        )}
-      </div>
-      <div className="flex-1 p-6 md:p-10 max-w-4xl">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Your Posts</h1>
-          <span className="text-sm text-gray-500">{posts.length} total</span>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 mb-12">
-          {posts.map((post) => (
-            <div
-              key={post.id}
-              className="relative aspect-square rounded-xl overflow-hidden group bg-gray-200"
-            >
-              <img
-                src={post.image}
-                className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                <Button
-                  onClick={() => handleDelete(post.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600"
-                >
-                  Delete
-                </Button>
+
+            <div className="flex-1 space-y-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-gray-400 font-medium">You</h2>
+                  <p className="text-gray-500 text-sm">@{user.username || 'you.leap'}</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <button 
+                    onClick={handleUpdateProfile}
+                    className="bg-gradient-to-r from-purple-500 to-blue-400 px-8 py-2 rounded-full font-semibold hover:scale-105 transition-transform"
+                  >
+                    Save
+                  </button>
+                  <button className="text-gray-400 text-sm hover:text-white">✕ Cancel</button>
+                </div>
               </div>
+
+              <textarea 
+                className="w-full bg-transparent border-none focus:ring-0 text-xl resize-none h-20 text-gray-200 placeholder-gray-600"
+                value={editData.bio}
+                onChange={(e) => setEditData({ ...editData, bio: e.target.value })}
+                maxLength={140}
+              />
+              <p className="text-right text-xs text-gray-600">{editData.bio?.length}/140</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 pt-8 border-t border-gray-800/50">
+            <div>
+              <h3 className="text-xs font-bold text-gray-500 mb-4 uppercase tracking-widest">Avatar Emoji</h3>
+              <div className="flex flex-wrap gap-4 text-2xl">
+                {['🚀', '🌸', '🎧', '🌙', '🌿', '⚡', '🐚', '🦋', '🍓', '🪐', '🔥'].map(emoji => (
+                  <button key={emoji} className="hover:scale-125 transition-transform">{emoji}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-gray-500 mb-4 uppercase tracking-widest">Avatar Color</h3>
+              <div className="flex flex-wrap gap-3">
+                {colors.map(color => (
+                  <button 
+                    key={color} 
+                    onClick={() => setSelectedColor(color)}
+                    className={`w-8 h-8 rounded-full ${color} ${selectedColor === color ? 'ring-2 ring-white ring-offset-4 ring-offset-[#161b22]' : ''}`} 
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'LEAPS', val: posts.length, color: 'text-purple-400' },
+            { label: 'HEARTS', val: 0, color: 'text-pink-400' },
+            { label: 'ECHOES', val: 0, color: 'text-blue-400' },
+            { label: 'SPARKS', val: followingCount, color: 'text-yellow-400' }
+          ].map((stat, i) => (
+            <div key={i} className="bg-[#161b22] border border-gray-800 p-4 rounded-2xl">
+              <p className={`text-[10px] font-bold ${stat.color} tracking-widest mb-1`}>{stat.label}</p>
+              <p className="text-2xl font-bold">{stat.val}</p>
             </div>
           ))}
-          {posts.length === 0 && (
-            <div className="col-span-full py-20 text-center bg-white rounded-2xl border-2 border-dashed border-gray-200">
-              <p className="text-gray-400">No posts yet</p>
-            </div>
-          )}
         </div>
 
-        {/* Following List */}
-        <div className="mt-10">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Following</h1>
-            <span className="text-sm text-gray-500">{followedUsers.length} people</span>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {followedUsers.map((followedUser) => (
-              <div
-                key={followedUser.id}
-                className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition flex items-center justify-between"
-              >
+        <div className="pt-8">
+          <h2 className="text-2xl font-bold mb-6">Your network</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {followedUsers.map((fUser) => (
+              <div key={fUser.id} className="bg-[#1c1c2d] p-4 rounded-2xl border border-gray-800 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <img
-                    src={followedUser.image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
-                    alt={followedUser.username}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-gray-50"
-                  />
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center font-bold">
+                    {fUser.firstName?.[0]}
+                  </div>
                   <div>
-                    <p className="font-bold text-gray-900 text-sm">
-                      {followedUser.firstName} {followedUser.lastName}
-                    </p>
-                    <p className="text-xs text-gray-500">@{followedUser.username || followedUser.firstName}</p>
+                    <p className="font-bold text-sm">{fUser.firstName} {fUser.lastName}</p>
+                    <p className="text-xs text-gray-500">@{fUser.username || 'user'}</p>
                   </div>
                 </div>
-                <Button
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                    isFollowing[followedUser.id]
-                      ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600"
-                      : "bg-gray-900 text-white"
-                  }`}
-                  onClick={() => handleFollowing(followedUser.id)}
+                <button 
+                  onClick={() => handleFollowing(fUser.id)}
+                  className="bg-gray-800 hover:bg-red-900/30 hover:text-red-400 px-4 py-1.5 rounded-full text-xs transition-colors"
                 >
-                  {isFollowing[followedUser.id] ? "Unfollow" : "Follow"}
-                </Button>
+                  Unfollow
+                </button>
               </div>
             ))}
-            {followedUsers.length === 0 && (
-              <div className="col-span-full py-10 text-center bg-gray-50 rounded-2xl border border-gray-100">
-                <p className="text-gray-500">You are not following anyone yet.</p>
-              </div>
-            )}
           </div>
         </div>
+
       </div>
     </div>
   );

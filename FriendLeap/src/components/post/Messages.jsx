@@ -124,6 +124,7 @@ const Messages = ({
           )}
         </div>
       </div>
+
       <div className="flex-1 flex flex-col bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-500">
         {selectedUser ? (
           <>
@@ -166,6 +167,7 @@ const Messages = ({
                 />
               </div>
             </div>
+
             <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30 custom-scrollbar">
               <div className="flex justify-center mb-8">
                 <span className="px-4 py-1.5 bg-white shadow-sm border border-gray-100 rounded-full text-[11px] font-bold text-gray-400 uppercase tracking-widest">
@@ -205,6 +207,7 @@ const Messages = ({
               })}
               <div ref={messageEndRef} />
             </div>
+
             <div className="p-6 bg-white border-t border-gray-50">
               <div className="flex items-center gap-4 bg-gray-50/50 rounded-2xl p-2 pr-2 border border-gray-100 focus-within:border-indigo-200 focus-within:bg-white transition-all">
                 <div className="flex gap-1 pl-2">
