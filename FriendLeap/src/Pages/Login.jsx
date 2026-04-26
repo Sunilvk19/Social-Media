@@ -78,7 +78,7 @@ const Login = () => {
           </div>
 
           <div className="flex items-center gap-8 text-sm font-semibold text-white/60">
-            <span>&copy; 2024 FriendLeap</span>
+            <span>&copy; 2026 FriendLeap</span>
             <div className="flex gap-4">
               <a href="#" className="hover:text-white transition-colors">Terms</a>
               <a href="#" className="hover:text-white transition-colors">Privacy</a>
@@ -170,7 +170,7 @@ const Login = () => {
               <Button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
-                className="ml-2 font-bold text-indigo-600 hover:text-indigo-800 transition-colors decoration-2 underline-offset-4 hover:underline"
+                className="ml-2 font-bold text-white bg-indigo-600 hover:text-indigo-800 transition-colors decoration-2 underline-offset-4 hover:underline"
               >
                 {isLogin ? "Sign up for free" : "Sign in to account"}
               </Button>

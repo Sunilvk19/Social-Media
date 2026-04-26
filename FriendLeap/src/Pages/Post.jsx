@@ -71,8 +71,8 @@ function Post({ onPostCreated }) {
   const handleImageChange = async (e) => {
     try {
       const file = e.target.files[0];
-      if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
-        alert("Please upload an image or video file.");
+      if (!file.type.startsWith("image/")) {
+        alert("Please upload an image file.");
         return;
       }
       if (file.size > 10 * 1024 * 1024) {
@@ -198,19 +198,11 @@ function Post({ onPostCreated }) {
           />
           {image && (
             <div className="relative mt-3 mb-2 animate-in fade-in zoom-in-95 duration-200">
-              {image.file.type.startsWith("video/") ? (
-                <video
-                  src={image.url}
-                  controls
-                  className="w-full max-h-80 rounded-2xl border border-gray-100 shadow-sm"
-                />
-              ) : (
                 <img
                   src={image.url}
                   alt="Preview"
                   className="w-full max-h-80 object-cover rounded-2xl border border-gray-100 shadow-sm"
                 />
-              )}
               <Button
                 onClick={removeImage}
                 className="absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-colors"
@@ -234,7 +226,7 @@ function Post({ onPostCreated }) {
 
                 <Input
                   type="file"
-                  accept="image/*,video/*"
+                  accept="image/*"
                   onChange={handleImageChange}
                   ref={fileInputRef}
                   className="hidden"

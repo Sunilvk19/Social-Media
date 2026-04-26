@@ -18,6 +18,7 @@ const API = axios.create({
         "content-type" : "application/json",
     }
 });
+
 API.interceptors.request.use(async (config)=>{
     if( config.method !== "get" || !config.cache ) return config;
 
