@@ -9,6 +9,7 @@ import {
   faMoon,
   faLeaf,
   faBolt,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import Button from "../common/Button";
 
@@ -20,12 +21,29 @@ const MOOD_STYLES = {
   spark: { icon: faBolt, label: "Spark", color: "bg-amber-400 text-black" },
 };
 
-const PostCard = ({ post, onLike, isLiked }) => {
+const PostCard = ({ post, onLike, onDelete, isLiked, currentUser }) => {
   const moodStyle = MOOD_STYLES[post.mood] || MOOD_STYLES.chill;
+  const isMyPost = post.userId === currentUser?.id;
 
   return (
     <div className="glass-card rounded-[40px] p-8 relative overflow-hidden group transition-all hover:translate-y-[-4px]">
-      {/* Mood Tag */}
+      <div className="absolute top-6 right-6 flex items-center gap-3">
+        {/* Only show delete button if it's the current user's post */}
+        {isMyPost && (
+          <button
+            onClick={() => onDelete(post.id)}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100"
+            title="Delete Post"
+          >
+            <FontAwesomeIcon icon={faTrash} size="xs" />
+          </button>
+        )}
+        
+        <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider ${moodStyle.color}`}>
+          <FontAwesomeIcon icon={moodStyle.icon} />
+          {moodStyle.label}
+        </div>
+      </div>
       <div className={`absolute top-6 right-6 flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider ${moodStyle.color}`}>
         <FontAwesomeIcon icon={moodStyle.icon} />
         {moodStyle.label}

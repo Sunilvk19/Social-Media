@@ -109,28 +109,23 @@ const Profile = () => {
     <div className="min-h-screen bg-linear-to-br from-purple-900 via-indigo-900 to-blue-900 text-white p-6">
       <div className="max-w-4xl mx-auto space-y-8">
 
-        {/* HEADER */}
         <div className="flex justify-between">
           <Button onClick={() => navigate("/home")} className="text-white/60 bg-white/5 backdrop-blur-md border border-white/10 hover:text-white hover:border-cyan-500/20 hover:bg-cyan-500/10transition-colors font-bold uppercase tracking-widest text-xs">
             ← Back to Home
           </Button>
         </div>
 
-        {/* PROFILE CARD */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
-          {/* Subtle Glow */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full"></div>
 
           <div className="flex flex-col md:flex-row gap-8">
 
-            {/* AVATAR SECTION */}
             <div className="flex flex-col items-center gap-4">
               <div className={`w-32 h-32 ${selectedColor} rounded-[32px] flex items-center justify-center text-5xl shadow-2xl border-4 border-white/10 transition-transform group-hover:scale-105 duration-500`}>
                 {editData.emoji}
               </div>
             </div>
 
-            {/* CONTENT SECTION */}
             <div className="flex-1">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex-1">
@@ -227,7 +222,6 @@ const Profile = () => {
                 )}
               </div>
 
-              {/* EDIT SECTION (EMOJIS & COLORS) */}
               {isEditing && (
                 <div className="grid md:grid-cols-2 gap-10 mt-10 pt-10 border-t border-white/5 animate-in fade-in slide-in-from-top-4 duration-500">
                   {/* EMOJI SELECTOR */}
@@ -250,7 +244,6 @@ const Profile = () => {
                     </div>
                   </div>
 
-                  {/* COLOR SELECTOR */}
                   <div>
                     <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-4">Aura Color</p>
                     <div className="flex flex-wrap gap-3">
@@ -273,14 +266,12 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* STATS SECTION */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          <Stat label="LEAPS" value={posts.length} />
-          <Stat label="SPARKS" value={followingCount} />
-          <Stat label="STARS" value={0} />
+          <Stat label="LEAPS" value={followingCount} />
+          <Stat label="POSTS" value={posts.length} />
+          <Stat label="STARS" value={5} />
         </div>
 
-        {/* FOLLOWING SECTION */}
         <div className="pt-8">
           <div className="flex items-center gap-4 mb-6">
             <h2 className="text-2xl font-black text-white tracking-tight">Your Connections</h2>

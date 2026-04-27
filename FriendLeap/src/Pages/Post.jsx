@@ -24,8 +24,7 @@ const MOODS = [
   { id: 'cozy', label: 'Cozy', icon: faLeaf, color: 'bg-green-500' },
 ];
 
-// PERSISTENT WORKER: We keep the worker alive outside the component so the AI model
-// stays loaded in memory even when the modal is closed and reopened.
+
 let globalWorker = null;
 
 function Post({ onPostCreated, onCancel }) {
@@ -88,7 +87,6 @@ function Post({ onPostCreated, onCancel }) {
   }, []);
 
   useEffect(() => {
-    // Initialize global worker once
     if (!globalWorker) {
       globalWorker = new Worker(
         new URL("../workers/CaptionWorker.js", import.meta.url),
@@ -99,7 +97,6 @@ function Post({ onPostCreated, onCancel }) {
 
     const handleWorkerMessage = (e) => {
       const { success, data, requestId, error } = e.data;
-      // Only update if this response matches our latest request
       if (requestId !== requestIdRef.current) return;
       
       if (success && data?.caption) {
@@ -158,7 +155,6 @@ function Post({ onPostCreated, onCancel }) {
       const newImageData = { ...optimized, base64 };
       setImage(newImageData);
       
-      // Auto-generate caption for new image
       const requestId = ++requestIdRef.current;
       setIsGenerating(true);
       workerRef.current.postMessage({
@@ -233,12 +229,10 @@ function Post({ onPostCreated, onCancel }) {
 
   return (
     <div className="bg-[#1a1429]/95 backdrop-blur-2xl border border-white/10 rounded-[40px] p-10 shadow-2xl w-full max-w-2xl relative overflow-hidden group">
-      {/* Background Decorative Glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/5 blur-[100px] rounded-full -mr-32 -mt-32"></div>
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/5 blur-[100px] rounded-full -ml-32 -mb-32"></div>
 
       <div className="relative z-10">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-black text-white tracking-tight">Send a Leap</h2>
           <Button 
@@ -249,7 +243,6 @@ function Post({ onPostCreated, onCancel }) {
           </Button>
         </div>
 
-        {/* Input Area */}
         <div className="relative group/input mb-8">
           <div className="absolute -inset-1 bg-linear-to-r from-rose-500 to-indigo-500 rounded-[30px] blur opacity-20 group-focus-within/input:opacity-40 transition-opacity duration-500"></div>
           <div className="relative bg-brand-dark border border-white/10 rounded-[28px] overflow-hidden">
@@ -275,7 +268,6 @@ function Post({ onPostCreated, onCancel }) {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-wrap gap-3 mb-8">
           <Button
             onClick={() => fileInputRef.current?.click()}
@@ -293,7 +285,6 @@ function Post({ onPostCreated, onCancel }) {
           />
           <Button
             onClick={generateCaption}
-            // disabled={isGenerating || !image}
             className={`flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-full text-white/70 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-30 ${isGenerating ? 'animate-pulse' : ''}`}
           >
             <FontAwesomeIcon icon={faWandMagicSparkles} className="text-purple-400" />
@@ -308,7 +299,6 @@ function Post({ onPostCreated, onCancel }) {
           </Button>
         </div>
 
-        {/* Mood Selectors */}
         <div className="flex flex-wrap gap-2 mb-10">
           {MOODS.map((mood) => (
             <Button
@@ -326,7 +316,6 @@ function Post({ onPostCreated, onCancel }) {
           ))}
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-between border-t border-white/5 pt-8">
           <span className="text-white/20 text-sm font-black font-mono">
             {name.length}/{MAX_CHARS}
