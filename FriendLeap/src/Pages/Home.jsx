@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getMockUsers, getMockPosts } from "../services/Mock";
 import { getRealUsers } from "../services/User";
-
 import Button from "../components/common/Button";
 import Post from "./Post";
 import PostCard from "../components/post/PostCard";
@@ -146,11 +145,19 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
     );
   }
 
+  const handleDeletePost = async (postId) => {
+  if (!window.confirm("Are you sure you want to delete this leap?")) return;
+
+  setPosts((prevPosts) => {
+    const updatedPosts = prevPosts.filter((post) => post.id !== postId);    
+    localforage.setItem(`posts_${currentUser.id}`, updatedPosts);
+    return updatedPosts;
+  });
+};
+
   return (
     <div className="min-h-screen pt-12 pb-20 px-4 md:px-8 max-w-[1600px] mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_350px] gap-8">
-        
-        {/* Left Column: Profile & Nav */}
         <aside className="hidden lg:flex flex-col gap-6 animate-in slide-in-from-left-8 duration-700">
           <div className="glass-card rounded-[40px] p-8 relative overflow-hidden group">
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full"></div>
@@ -165,17 +172,17 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
                 </div>
                 <div className="flex flex-col truncate">
                   <h2 className="text-xl font-black text-white truncate">
-                    {currentUser?.firstName || "Sunil"}
+                    {currentUser?.firstName}
                   </h2>
                   <p className="text-white/30 text-sm font-bold truncate">
-                    @{currentUser?.username || "you"}.leap
+                    @{currentUser?.username}.leap
                   </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { label: "Leaps", value: posts.filter(p => p.userId === currentUser?.id).length },
+                  { label: "Posts", value: posts.filter(p => p.userId === currentUser?.id).length },
                   { label: "Friends", value: Object.values(isFollowing).filter(v => v === true).length, onClick: () => setShowFollowingModal(true) },
                   { label: "Sparks", value: 0 }
                 ].map((stat, i) => (
@@ -196,9 +203,9 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
           <nav className="glass-card rounded-[40px] p-4 flex flex-col gap-1">
             {[
               { icon: faCompass, label: "Discover", color: "text-cyan-400" },
-              { icon: faFire, label: "Trending", color: "text-orange-500" },
-              { icon: faUsers, label: "Circle", color: "text-indigo-400" },
-              { icon: faStar, label: "Saved Sparks", color: "text-amber-400" },
+              { icon: faFire, label: "Trending", onClick: () => navigate("/explore"),color: "text-orange-500" },
+              { icon: faUsers, label: "Circle",onClick: () => navigate("/circle"), color: "text-indigo-400" },
+              { icon: faUsers, label: "Messages",onClick: () => navigate("/messages"), color: "text-indigo-400" },
               { icon: faUser, label: "Your profile", onClick: () => navigate("/profile"), color: "text-rose-400" },
             ].map((item, index) => (
               <Button
@@ -217,7 +224,6 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
           </nav>
         </aside>
 
-        {/* Center Column: Feed */}
         <main className="space-y-8 animate-in fade-in duration-1000">
           <MoodFilter activeMood={activeMood} onMoodChange={setActiveMood} />
           
@@ -229,6 +235,8 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
                   post={post} 
                   onLike={handleLike} 
                   isLiked={likedPosts.has(post.id)} 
+                  onDelete={handleDeletePost} 
+                  currentUser={currentUser}
                   className="glass-card rounded-[40px] p-4"
                 />
               ))
@@ -242,13 +250,11 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
           </div>
         </main>
 
-        {/* Right Column: Trending */}
         <aside className="hidden xl:block animate-in slide-in-from-right-8 duration-700">
            <TrendingSidebar />
         </aside>
       </div>
 
-      {/* Post Modal Overlay */}
       {isPostOpen && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
           <div 
@@ -261,7 +267,6 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
         </div>
       )}
 
-      {/* Following Modal */}
       {showFollowingModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="glass-card rounded-[40px] w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">

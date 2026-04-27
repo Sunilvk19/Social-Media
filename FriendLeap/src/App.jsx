@@ -7,6 +7,7 @@ import Login from "./Pages/Login";
 import Layout from "./components/layout/Layout";
 import Profile from "./Pages/Profile";
 import Chat from "./components/post/Chat";
+import Circle from "./Pages/Circle";
 
 const App = () => {
   const [isPostOpen, setIsPostOpen] = useState(false);
@@ -18,6 +19,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+
         <Route
           path="/home"
           element={
@@ -26,6 +28,7 @@ const App = () => {
             </Layout>
           }
         />
+
         <Route
           path="/post"
           element={
@@ -34,20 +37,23 @@ const App = () => {
             </Layout>
           }
         />
+
         <Route
           path="/explore"
           element={
-            <Layout onCreatePost={handleOpenPost}>
               <Explore />
-            </Layout>
           }
         />
         <Route
           path="/messages"
           element={
-            <Layout onCreatePost={handleOpenPost} isChat={true}>
               <Chat />
-            </Layout>
+          }
+        />
+        <Route
+          path="/circle"
+          element={
+              <Circle/>
           }
         />
         <Route
@@ -57,6 +63,7 @@ const App = () => {
           }
         />
       </Routes>
+    
     </BrowserRouter>
   );
 };
