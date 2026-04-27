@@ -55,7 +55,7 @@ const Login = () => {
           alt="Login background" 
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-10000 hover:scale-110" 
         />
-        <div className="absolute inset-0 bg-linear-to-br from-[#1a1033]/90 via-[#0f0a19]/70 to-transparent mix-blend-multiply" />
+        <div className="absolute inset-0 bg-linear-to-br from-brand-dark/90 via-brand-dark/70 to-transparent mix-blend-multiply" />
         
         <div className="relative z-10 w-full h-full flex flex-col justify-between p-16 text-white">
           <div className="flex items-center gap-3">
@@ -66,7 +66,7 @@ const Login = () => {
           </div>
 
           <div className="max-w-xl animate-in fade-in slide-in-from-bottom-12 duration-1000">
-            <h2 className="text-7xl font-black leading-[1] mb-8 tracking-tighter">
+            <h2 className="text-7xl font-black leading-none mb-8 tracking-tighter">
               Connect. <br />
               <span className="text-cyan-400">Share.</span> <br />
               Grow.
@@ -87,7 +87,7 @@ const Login = () => {
       </div>
 
       {/* Right Side: Form */}
-      <div className="w-full lg:w-2/5 flex items-center justify-center p-8 sm:p-16 bg-[#0f0a19] relative">
+      <div className="w-full lg:w-2/5 flex items-center justify-center p-8 sm:p-16 bg-brand-dark relative">
         <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32 lg:hidden" />
         
         <div className="w-full max-w-md space-y-10 relative z-10">

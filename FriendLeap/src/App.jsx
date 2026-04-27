@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home";
 import Explore from "./Pages/Explore";
@@ -9,6 +9,11 @@ import Profile from "./Pages/Profile";
 import Chat from "./components/post/Chat";
 
 const App = () => {
+  const [isPostOpen, setIsPostOpen] = useState(false);
+
+  const handleOpenPost = () => setIsPostOpen(true);
+  const handleClosePost = () => setIsPostOpen(false);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -16,15 +21,15 @@ const App = () => {
         <Route
           path="/home"
           element={
-            <Layout>
-              <Home />
+            <Layout onCreatePost={handleOpenPost}>
+              <Home isPostOpen={isPostOpen} setIsPostOpen={setIsPostOpen} />
             </Layout>
           }
         />
         <Route
           path="/post"
           element={
-            <Layout>
+            <Layout onCreatePost={handleOpenPost}>
               <Post />
             </Layout>
           }
@@ -32,7 +37,7 @@ const App = () => {
         <Route
           path="/explore"
           element={
-            <Layout>
+            <Layout onCreatePost={handleOpenPost}>
               <Explore />
             </Layout>
           }
@@ -40,7 +45,7 @@ const App = () => {
         <Route
           path="/messages"
           element={
-            <Layout>
+            <Layout onCreatePost={handleOpenPost} isChat={true}>
               <Chat />
             </Layout>
           }

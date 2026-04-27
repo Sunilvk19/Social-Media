@@ -10,6 +10,7 @@ import {
   faLeaf,
   faBolt,
 } from "@fortawesome/free-solid-svg-icons";
+import Button from "../common/Button";
 
 const MOOD_STYLES = {
   chill: { icon: faCloud, label: "Cozy", color: "bg-emerald-400 text-black" }, // Note: Adjusted labels to match image
@@ -66,23 +67,23 @@ const PostCard = ({ post, onLike, isLiked }) => {
 
       <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/5">
         <div className="flex gap-6">
-          <button
+          <Button
             onClick={() => onLike(post.id)}
-            className={`flex items-center gap-2.5 transition-all hover:scale-110 ${isLiked ? "text-rose-500" : "text-white/40 hover:text-white"}`}
+            className={`flex items-center gap-2.5 bg-white/5 backdrop-blur-md border border-white/10 transition-all hover:scale-110 ${isLiked ? "text-rose-500" : "text-white/40 hover:text-white"}`}
           >
             <FontAwesomeIcon icon={faHeart} className={isLiked ? "animate-pulse" : ""} />
             <span className="text-sm font-bold">{post.like || 0}</span>
-          </button>
-          <button className="flex items-center gap-2.5 text-white/40 hover:text-white transition-all hover:scale-110">
+          </Button>
+          <Button className="flex items-center gap-2.5 bg-white/5 backdrop-blur-md border border-white/10 text-white/40 hover:text-white transition-all hover:scale-110">
             <FontAwesomeIcon icon={faComment} />
             <span className="text-sm font-bold">{post.comments?.length || 0}</span>
-          </button>
+          </Button>
         </div>
         
-        <button className="flex items-center gap-2 text-white/40 hover:text-cyan-400 transition-all font-bold text-sm">
+        <Button className="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 text-white/40 hover:text-cyan-400 transition-all font-bold text-sm">
           <FontAwesomeIcon icon={faShare} />
           Leap back
-        </button>
+        </Button>
       </div>
     </div>
   );
