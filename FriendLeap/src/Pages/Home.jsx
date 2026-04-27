@@ -19,7 +19,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
-const Home = () => {
+const Home = ({ isPostOpen, setIsPostOpen }) => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState({});
   const [users, setUsers] = useState([]);
@@ -37,26 +37,31 @@ const Home = () => {
   };
 
   const handleLike = (id) => {
+    const isCurrentlyLiked = likedPosts.has(id);
+    
     setLikedPosts((prev) => {
       const newSet = new Set(prev);
-      setPosts((prevPosts) => {
-        const updatedPosts = prevPosts.map((post) => {
-          if (post.id === id) {
-            if (newSet.has(id)) {
-              newSet.delete(id);
-              return { ...post, like: (post.like || 0) - 1 };
-            } else {
-              newSet.add(id);
-              return { ...post, like: (post.like || 0) + 1 };
-            }
-          }
-          return post;
-        });
-        localforage.setItem(`posts_${currentUser.id}`, updatedPosts);
-        return updatedPosts;
-      });
+      if (isCurrentlyLiked) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
       localforage.setItem(`liked_posts_${currentUser.id}`, Array.from(newSet));
       return newSet;
+    });
+
+    setPosts((prevPosts) => {
+      const updatedPosts = prevPosts.map((post) => {
+        if (post.id === id) {
+          return {
+            ...post,
+            like: isCurrentlyLiked ? (post.like || 0) - 1 : (post.like || 0) + 1,
+          };
+        }
+        return post;
+      });
+      localforage.setItem(`posts_${currentUser.id}`, updatedPosts);
+      return updatedPosts;
     });
   };
 
@@ -78,7 +83,7 @@ const Home = () => {
         }
         setCurrentUser(userData);
 
-        const [mockPosts, mockUsers, realUsers] = await Promise.all([
+        const [mockPostsRes, mockUsers, realUsers] = await Promise.all([
           getMockPosts(),
           getMockUsers(),
           getRealUsers(),
@@ -91,10 +96,9 @@ const Home = () => {
         if (localPosts) {
           setPosts(localPosts);
         } else {
-          const postsRes = await getMockPosts();
-          if (postsRes?.posts) {
-            setPosts(postsRes.posts);
-            await localforage.setItem(`posts_${userData.id}`, postsRes.posts);
+          if (mockPostsRes?.posts) {
+            setPosts(mockPostsRes.posts);
+            await localforage.setItem(`posts_${userData.id}`, mockPostsRes.posts);
           }
         }
 
@@ -127,6 +131,7 @@ const Home = () => {
       localforage.setItem(`posts_${currentUser.id}`, updated);
       return updated;
     });
+    setIsPostOpen(false);
   };
 
   const filteredFeed = posts
@@ -135,7 +140,7 @@ const Home = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0f0a19]">
+      <div className="min-h-screen flex items-center justify-center bg-brand-dark">
         <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -148,9 +153,7 @@ const Home = () => {
         {/* Left Column: Profile & Nav */}
         <aside className="hidden lg:flex flex-col gap-6 animate-in slide-in-from-left-8 duration-700">
           <div className="glass-card rounded-[40px] p-8 relative overflow-hidden group">
-            {/* Background Glow */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full"></div>
-            
             <div className="relative z-10">
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-16 h-16 rounded-full bg-linear-to-tr from-rose-400 to-pink-500 flex items-center justify-center overflow-hidden shadow-lg border-2 border-white/10">
@@ -198,10 +201,10 @@ const Home = () => {
               { icon: faStar, label: "Saved Sparks", color: "text-amber-400" },
               { icon: faUser, label: "Your profile", onClick: () => navigate("/profile"), color: "text-rose-400" },
             ].map((item, index) => (
-              <button
+              <Button
                 key={index}
                 onClick={item.onClick}
-                className="flex items-center gap-5 p-5 rounded-[28px] hover:bg-white/5 transition-all group w-full text-left"
+                className="flex items-center gap-5 p-5 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/10 hover:bg-white/5 transition-all group w-full text-left"
               >
                 <div className={`${item.color} text-xl group-hover:scale-125 transition-transform duration-300`}>
                   <FontAwesomeIcon icon={item.icon} />
@@ -209,7 +212,7 @@ const Home = () => {
                 <span className="text-[17px] font-bold text-white/70 group-hover:text-white transition-colors">
                   {item.label}
                 </span>
-              </button>
+              </Button>
             ))}
           </nav>
         </aside>
@@ -218,8 +221,6 @@ const Home = () => {
         <main className="space-y-8 animate-in fade-in duration-1000">
           <MoodFilter activeMood={activeMood} onMoodChange={setActiveMood} />
           
-          <Post onPostCreated={handleNewPost} />
-
           <div className="space-y-8">
             {filteredFeed?.length > 0 ? (
               filteredFeed.map((post) => (
@@ -228,6 +229,7 @@ const Home = () => {
                   post={post} 
                   onLike={handleLike} 
                   isLiked={likedPosts.has(post.id)} 
+                  className="glass-card rounded-[40px] p-4"
                 />
               ))
             ) : (
@@ -245,6 +247,19 @@ const Home = () => {
            <TrendingSidebar />
         </aside>
       </div>
+
+      {/* Post Modal Overlay */}
+      {isPostOpen && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-brand-dark/90 backdrop-blur-md"
+            onClick={() => setIsPostOpen(false)}
+          ></div>
+          <div className="relative w-full max-w-2xl animate-in zoom-in-95 duration-300">
+             <Post onPostCreated={handleNewPost} onCancel={() => setIsPostOpen(false)} />
+          </div>
+        </div>
+      )}
 
       {/* Following Modal */}
       {showFollowingModal && (

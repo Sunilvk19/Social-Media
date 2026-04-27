@@ -43,6 +43,13 @@
       "receiverId": "-iUJwwYOVhM",
       "timestamp": "2026-04-24T09:37:32.907Z",
       "id": "of1cg0UPMB4"
+    },
+    {
+      "text": "hi",
+      "senderId": "BjaLfb8xc6Q",
+      "receiverId": "user_0ocvsfw_1776841208708",
+      "timestamp": "2026-04-26T09:04:41.418Z",
+      "id": "cXGTbEMN6d8"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

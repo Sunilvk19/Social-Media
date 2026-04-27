@@ -1,10 +1,10 @@
 import React from 'react'
 import Navbar from './Navbar'
 
-const Layout = ({ children, isChat = false }) => {
+const Layout = ({ children, isChat = false, onCreatePost }) => {
   return (
     <div className=''>
-      {!isChat && <Navbar />}
+      <Navbar onCreatePost={onCreatePost} />
       <main>{children}</main>
     </div>
   )
