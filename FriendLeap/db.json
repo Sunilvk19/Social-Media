@@ -12,7 +12,7 @@
         "color": "from-amber-200 via-yellow-400 to-amber-500",
         "bg": "bg-yellow-400/10",
         "visibility": "Friends",
-        "updatedAt": "2026-04-28T09:04:00.241Z"
+        "updatedAt": "2026-04-28T10:19:41.583Z"
       }
     },
     {
@@ -29,12 +29,27 @@
       "password": "$2b$10$w94lNeHbvHTPOV8XVAZG3.iDUZf8HeuoY6LdBiniJPeLdgApiZ/x.",
       "id": "-iUJwwYOVhM",
       "mood": {
-        "emoji": "🧘",
-        "label": "Calm",
-        "color": "from-teal-400 to-emerald-500",
-        "bg": "bg-cyan-400/10",
+        "emoji": "🤩",
+        "label": "Excited",
+        "color": "from-orange-400 via-rose-400 to-amber-500",
+        "bg": "bg-pink-400/10",
         "visibility": "Friends",
-        "updatedAt": "2026-04-27T11:05:01.663Z"
+        "updatedAt": "2026-04-28T11:44:57.203Z"
+      }
+    },
+    {
+      "firstName": "Suraj",
+      "lastName": "S",
+      "email": "suraj@gmail.com",
+      "password": "$2b$10$neMZJGccTjWSAlkUxTv/GuVcO/qNpczLzAfs0FXeUXKnnrxS0diYS",
+      "id": "_QrJ0HIKHLg",
+      "mood": {
+        "emoji": "😊",
+        "label": "Happy",
+        "color": "from-amber-200 via-yellow-400 to-amber-500",
+        "bg": "bg-yellow-400/10",
+        "visibility": "Friends",
+        "updatedAt": "2026-04-28T11:50:52.980Z"
       }
     }
   ],
@@ -73,6 +88,13 @@
       "receiverId": 4,
       "timestamp": "2026-04-28T08:39:50.274Z",
       "id": "HuNTawbVO5I"
+    },
+    {
+      "text": "hi, ",
+      "senderId": "_QrJ0HIKHLg",
+      "receiverId": 76,
+      "timestamp": "2026-04-28T11:49:58.690Z",
+      "id": "dqLpjy3hSDU"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

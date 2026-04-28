@@ -4,6 +4,7 @@ import { getMockPosts } from "../services/Mock";
 import Input from "../components/common/Input";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import Button from "../components/common/Button";
 
 const Explore = () => {
   const navigate = useNavigate();

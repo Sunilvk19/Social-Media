@@ -51,10 +51,7 @@ const Chat = () => {
       }
     };
     loadChatData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
-
-  // Optimized Polling (Server-side filtering)
+  }, []);
   useEffect(() => {
     if (!currentUser || !selectedUser) return;
 
@@ -63,7 +60,6 @@ const Chat = () => {
 
     const fetchMessages = async () => {
       try {
-        // Fetch only relevant messages using json-server filters for efficiency
         const [sent, received] = await Promise.all([
           axios.get(`http://localhost:5000/messages?senderId=${currentUser.id}&receiverId=${selectedUser.id}`),
           axios.get(`http://localhost:5000/messages?senderId=${selectedUser.id}&receiverId=${currentUser.id}`)
@@ -104,16 +100,12 @@ const Chat = () => {
 
     try {
       const res = await axios.post("http://localhost:5000/messages", newMessage);
-      
-      // Notify recipient
       sendNotification({
         userId: selectedUser.id,
         senderId: currentUser.id,
         type: "message",
         content: `sent you a message: "${text.substring(0, 20)}..."`
       });
-
-      // Immediately update local state for better responsiveness
       setMessages((prev) => [...prev, res.data]);
     } catch (er) {
       console.error("Send error:", er.message);
@@ -123,7 +115,6 @@ const Chat = () => {
   const handleClearChat = useCallback(async () => {
     if (!window.confirm("Clear this conversation?")) return;
     try {
-      // Parallel deletions for speed
       await Promise.all(messages.map(mes => 
         axios.delete(`http://localhost:5000/messages/${mes.id}`)
       ));
