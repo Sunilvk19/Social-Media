@@ -229,8 +229,7 @@ const Messages = ({
         )}
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default Messages;
