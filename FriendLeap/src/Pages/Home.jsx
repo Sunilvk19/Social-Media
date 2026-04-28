@@ -343,6 +343,8 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
                   onLike={handleLike}
                   isLiked={likedPosts.has(post.id)}
                   authorMood={users.find((u) => u.id === post.userId)?.mood}
+                  currentUser={currentUser}
+                  onDelete={handleDeletePost}
                   className="glass-card rounded-[40px] p-4"
                 />
               ))
