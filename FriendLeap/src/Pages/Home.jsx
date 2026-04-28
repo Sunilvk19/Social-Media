@@ -172,10 +172,11 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
                 </div>
                 <div className="flex flex-col truncate">
                   <h2 className="text-xl font-black text-white truncate">
-                    {currentUser?.firstName}
+                    {currentUser?.firstName} 
+                    {currentUser?.lastName}
                   </h2>
                   <p className="text-white/30 text-sm font-bold truncate">
-                    @{currentUser?.username}.leap
+                    @{currentUser?.firstName}.leap
                   </p>
                 </div>
               </div>

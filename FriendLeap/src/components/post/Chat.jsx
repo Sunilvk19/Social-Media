@@ -12,7 +12,6 @@ const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize data on mount
   useEffect(() => {
     const loadChatData = async () => {
       try {
@@ -30,7 +29,6 @@ const Chat = () => {
         const mockUsers = mockRes?.users || [];
         const realUsers = Array.isArray(realUsersData) ? realUsersData : [];
         
-        // Combine, filter duplicates, and remove self
         const allUsers = [...realUsers, ...mockUsers];
         const uniqueFollowed = allUsers.filter((u, i, self) => 
           self.findIndex(t => t.id.toString() === u.id.toString()) === i && 
@@ -41,10 +39,10 @@ const Chat = () => {
         const displayUsers = [...uniqueFollowed].reverse();
         setFollowedUsers(displayUsers);
 
-        // Only auto-select the first user if none is selected yet
         if (displayUsers.length > 0 && !selectedUser) {
           setSelectedUser(displayUsers[0]);
         }
+        
       } catch (error) {
         console.error("Error initializing chat:", error);
       } finally {
