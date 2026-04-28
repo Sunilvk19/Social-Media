@@ -8,9 +8,6 @@ import {
   faPaperclip,
   faFaceSmile,
   faTrash,
-  faVoicemail,
-  faMicrophoneAltSlash,
-  faMicrophoneLines,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
@@ -45,14 +42,31 @@ const Messages = ({
       .includes(searchQuery.toLowerCase()),
   );
 
-  const handleVoiceNote = () => {
+ return (
+  <div className="flex flex-col h-screen bg-[#F8FAFC] p-4 md:p-6 gap-4 overflow-hidden font-sans">
     
-  }
+    {/* --- TOP NAVIGATION BAR --- */}
+    <div className="flex items-center justify-between px-2">
+      <button 
+        onClick={() => navigate("/home")} 
+        className="group flex items-center gap-2 text-gray-500 bg-white border border-gray-200/60 px-4 py-2.5 rounded-2xl hover:text-indigo-600 hover:border-indigo-100 hover:bg-indigo-50/50 transition-all duration-300 font-bold uppercase tracking-widest text-[10px] shadow-sm active:scale-95"
+      >
+        <span className="transition-transform group-hover:-translate-x-1">←</span> 
+        Back to Home
+      </button>
+      
+      {/* Optional: User status or page indicator */}
+      <div className="hidden md:block text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+        End-to-End Encrypted
+      </div>
+    </div>
 
-  return (
-    <div className="flex h-[calc(100vh-80px)] bg-linear-to-br from-purple-900 via-indigo-900 to-blue-900 text-white  font-sans gap-6 p-6 overflow-hidden">
-      <div className="w-96 flex flex-col bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden animate-in slide-in-from-left-8 duration-700">
-        <div className="p-6 space-y-6">
+    {/* --- MAIN CHAT INTERFACE --- */}
+    <div className="flex flex-1 gap-6 overflow-hidden">
+      
+      {/* LEFT SIDEBAR: CONTACTS */}
+      <div className="w-80 lg:w-96 flex flex-col bg-white rounded-[32px] shadow-xl shadow-indigo-100/20 border border-gray-100 overflow-hidden">
+        <div className="p-6 pb-4 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-black text-gray-900 tracking-tight">
               Messages
@@ -68,12 +82,11 @@ const Messages = ({
               placeholder="Search contacts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="rounded-2xl border-gray-100 bg-gray-50/50 py-3 group-focus-within:bg-gray-800 text-black transition-all shadow-none"
+              className="rounded-2xl border-gray-100 bg-gray-50/80 py-3 group-focus-within:bg-white group-focus-within:ring-4 group-focus-within:ring-indigo-500/5 transition-all shadow-none"
             />
           </div>
         </div>
 
-        {/* User List */}
         <div className="flex-1 overflow-y-auto px-4 pb-6 custom-scrollbar">
           {filteredUsers.length > 0 ? (
             <div className="space-y-2">
@@ -110,21 +123,15 @@ const Messages = ({
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-lg rounded-2xl flex items-center justify-center mb-4 text-gray-300">
-                <FontAwesomeIcon icon={faSearch} size="lg" />
-              </div>
-              <p className="text-gray-400 text-sm font-medium leading-relaxed">
-                {searchQuery
-                  ? "No contacts found matching your search."
-                  : "Follow someone to start a conversation!"}
-              </p>
+            <div className="text-center py-20 text-gray-400 text-xs font-bold uppercase tracking-widest">
+              No results found
             </div>
           )}
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-500">
+      {/* RIGHT SIDE: CHAT WINDOW */}
+      <div className="flex-1 flex flex-col bg-white rounded-[32px] shadow-xl shadow-indigo-100/20 border border-gray-100 overflow-hidden relative">
         {selectedUser ? (
           <>
             {/* Header */}
@@ -155,16 +162,10 @@ const Messages = ({
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30 custom-scrollbar">
-              <div className="flex justify-center mb-8">
-                <span className="px-4 py-1.5 bg-white/20 backdrop-blur-lg shadow-sm border border-gray-900 rounded-full text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                  Today
-                </span>
-              </div>
-
-              {messages.map((mes, index) => {
-                const isMine =
-                  mes.senderId.toString() === currentUser?.id.toString();
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#FDFDFF] custom-scrollbar">
+              {messages.map((mes) => {
+                const isMine = mes.senderId.toString() === currentUser?.id.toString();
                 return (
                   <div key={mes.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
                     <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[75%]`}>
@@ -185,27 +186,15 @@ const Messages = ({
               <div ref={messageEndRef} />
             </div>
 
-            <div className="p-6 bg-white border-t border-gray-50">
-              <div className="flex items-center gap-4 bg-gray-50/50 rounded-2xl p-2 pr-2 border border-gray-100 focus-within:border-indigo-200 focus-within:bg-white transition-all">
-                <div className="flex gap-1 pl-2">
-                  <Button className="w-10 h-10 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-white transition-all">
-                    <FontAwesomeIcon icon={faPaperclip} />
-                  </Button>
-                  <Button className="w-10 h-10 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-white transition-all">
-                    <FontAwesomeIcon icon={faFaceSmile} />
-                  </Button>
-                </div>
-
-                <Input
+            <div className="p-6 bg-white">
+              <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-1.5 focus-within:bg-white focus-within:ring-4 focus-within:ring-indigo-500/5 transition-all">
+                <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Write something..."
                   className="flex-1 bg-transparent border-none py-3 px-4 text-gray-800 text-sm focus:outline-none"
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 />
-                <Button className="bg-indigo-50 hover:border-green-500 ">
-                  {selectedUser.isMick ? <FontAwesomeIcon icon={faMicrophoneLines} color="black"/> : <FontAwesomeIcon icon={faMicrophoneLines} />}
-                </Button>
                 <Button
                   onClick={handleSend}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-6 py-3 shadow-lg shadow-indigo-200 transition-all font-bold text-xs"
@@ -216,7 +205,6 @@ const Messages = ({
             </div>
           </>
         ) : (
-          /* Empty State */
           <div className="flex-1 flex flex-col items-center justify-center p-12 bg-white">
              <div className="w-24 h-24 bg-indigo-50 rounded-[40px] flex items-center justify-center text-indigo-500 mb-6">
                 <FontAwesomeIcon icon={faMessage} size="2x" className="opacity-50" />
@@ -229,7 +217,8 @@ const Messages = ({
         )}
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default Messages;

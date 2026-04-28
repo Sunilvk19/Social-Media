@@ -20,7 +20,7 @@ const Input = forwardRef(({
   endAdornment,
   accept,
 }, ref) => {
-    const inputClass = `w-full ${type === 'file' ? '' : 'pl-4 pr-4 py-2 bg-gray-50 border border-gray-200 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white'} transition-all shadow-inner
+    const inputClass = `w-full ${type === 'file' ? '' : 'pl-4 pr-4 py-2 bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white'} transition-all shadow-inner
      ${className || ''} ${icon ? 'pl-10' : ''} ${endAdornment ? 'pr-10' : ''}`;
     
   return (  
