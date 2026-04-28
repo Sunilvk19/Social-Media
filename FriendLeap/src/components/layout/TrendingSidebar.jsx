@@ -12,7 +12,6 @@ const TRENDING_TOPICS = [
 const TrendingSidebar = () => {
   return (
     <div className="space-y-6">
-      {/* Trending Card */}
       <div className="glass-card rounded-[40px] p-8">
         <div className="flex items-center gap-3 mb-8">
           <div className="text-orange-500">
