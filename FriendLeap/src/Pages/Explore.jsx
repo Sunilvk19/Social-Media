@@ -1,15 +1,14 @@
 import localforage from "localforage";
 import React, { useEffect, useState } from "react";
-import { getMockPosts, getMockUsers } from "../services/Mock";
-
+import { getMockPosts } from "../services/Mock";
 import Input from "../components/common/Input";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { getRealUsers } from "../services/User";
+import { useNavigate } from "react-router-dom";
 
 const Explore = () => {
+  const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState({});
   const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -17,17 +16,8 @@ const Explore = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userData = await localforage.getItem("Current_user");
-        if (userData) setCurrentUser(userData);
-
-        const [mockPosts, mockUsers, realUsers] = await Promise.all([
-          getMockPosts(),
-          getMockUsers(),
-          getRealUsers(),
-        ]);
-
-        const totalUsers = [...realUsers, ...mockUsers.users];
-        setUsers(totalUsers);
+        const mockPosts= await getMockPosts();
+      
         if (mockPosts?.posts) setPosts(mockPosts.posts);
       } catch (error) {
         console.log(error.message);
@@ -40,14 +30,6 @@ const Explore = () => {
   }, []);
 
   const query = searchQuery.trim().toLowerCase();
-
-  const filteredUsers = users
-  .filter((user) => user.id !== currentUser.id)
-  .filter((user) => {
-    if (!query) return true;
-    const fullName = user.username? user.username : `${user.firstName || ''} ${user.lastName || ''}`.trim();
-    return fullName.toLowerCase().includes(query.toLowerCase());
-  });
 
   const filteredPosts = query
     ? posts.filter((post) => {
@@ -65,6 +47,16 @@ const Explore = () => {
         </div>
       ) : (
         <div className="max-w-7xl mx-auto space-y-10">
+      
+        <div className="flex justify-start">
+            <button 
+              onClick={() => navigate("/home")} 
+              className="text-gray-500 bg-white border border-gray-200 px-4 py-2 rounded-xl hover:text-indigo-600 transition-all font-bold uppercase tracking-widest text-xs shadow-sm"
+            >
+              ← Back to Home
+            </button>
+        </div>
+        
           <div className="relative max-w-xl mx-auto mb-6">
             <Input
               icon={faMagnifyingGlass}
@@ -83,37 +75,7 @@ const Explore = () => {
               </Button>
             )}
           </div>
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 drop-shadow-sm">
-              Discover People
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {filteredUsers.slice(0,8).map((user) => (
-                <div
-                  key={user.id}
-                  className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-lg transition-shadow cursor-pointer"
-                >
-                  <img
-                    src={
-                      user.image ||
-                      "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                    }
-                    alt="user-image"
-                    className="w-14 h-14 rounded-full object-cover shadow-sm bg-gray-50"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-gray-800">
-                      {user.firstName} {user.lastName}
-                    </span>
-                    <span>
-                      {user.followers} 
-                    </span>
-                  </div>
-                </div>
-              ))}
-              
-            </div>
-          </section>
+
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-6 drop-shadow-sm">
               Trending Posts

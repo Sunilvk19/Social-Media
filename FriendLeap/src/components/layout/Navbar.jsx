@@ -96,23 +96,7 @@ const Navbar = ({ onCreatePost = () => {} }) => {
               Friend<span className="text-cyan-400">Leap</span>
             </span>
           </Link>
-
-          <ul className="hidden md:flex items-center justify-center gap-8 text-sm font-bold text-white/50 whitespace-nowrap">
-            {navLinks.map((item) => {
-              const isActive = location.pathname.startsWith(item.path);
-              return (
-                <li
-                  key={item.name}
-                  className={`transition-colors ${isActive ? "text-cyan-400" : "hover:text-white"}`}
-                >
-                  <Link to={item.path} className="py-2 inline-block font-bold">
-                    {item.name}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-
+          
           <div className="flex items-center justify-end gap-3 shrink-0">
             <Button
               onClick={onCreatePost}
@@ -164,43 +148,8 @@ const Navbar = ({ onCreatePost = () => {} }) => {
                 Logout
               </Button>
             </div>
-
-            <Button
-              className="md:hidden p-2 text-white/50 hover:text-white"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              <FontAwesomeIcon
-                icon={isMobileMenuOpen ? faXmark : faBars}
-                size="lg"
-              />
-            </Button>
           </div>
         </div>
-
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-brand-dark border-t border-white/5 p-6 animate-in slide-in-from-top duration-300">
-            <ul className="flex flex-col gap-2">
-              {navLinks.map((item) => {
-                const isActive = location.pathname.startsWith(item.path);
-                return (
-                  <li key={item.name}>
-                    <Link
-                      to={item.path}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`block px-5 py-4 rounded-2xl font-bold transition-all ${
-                        isActive
-                          ? "text-cyan-400 bg-cyan-400/5"
-                          : "text-white/50 hover:text-white hover:bg-white/5"
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
       </nav>
       <div className="h-[76px]"></div>
       <MoodPickerSheet

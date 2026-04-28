@@ -161,6 +161,11 @@ const Profile = () => {
 
           <div className="flex flex-col md:flex-row gap-8">
             {/* AVATAR SECTION */}
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full"></div>
+
+          <div className="flex flex-col md:flex-row gap-8">
+
             <div className="flex flex-col items-center gap-4">
               <div className={`relative p-1.5 rounded-[38px] transition-all duration-500 shadow-2xl ${user.mood ? 'bg-linear-to-tr ' + user.mood.color : 'bg-white/10'}`}>
                 <div className={`w-32 h-32 ${selectedColor} rounded-[32px] flex items-center justify-center text-5xl border-4 border-brand-dark transition-transform group-hover:scale-105 duration-500 overflow-hidden`}>
@@ -178,7 +183,6 @@ const Profile = () => {
               </div>
             </div>
 
-            {/* CONTENT SECTION */}
             <div className="flex-1">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex-1">
@@ -296,7 +300,6 @@ const Profile = () => {
                 )}
               </div>
 
-              {/* EDIT SECTION (EMOJIS & COLORS) */}
               {isEditing && (
                 <div className="grid md:grid-cols-2 gap-10 mt-10 pt-10 border-t border-white/5 animate-in fade-in slide-in-from-top-4 duration-500">
                   {/* EMOJI SELECTOR */}
@@ -321,7 +324,6 @@ const Profile = () => {
                     </div>
                   </div>
 
-                  {/* COLOR SELECTOR */}
                   <div>
                     <p className="text-[10px] font-black text-white/10 uppercase tracking-widest mb-4">
                       Aura Color
@@ -346,14 +348,12 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* STATS SECTION */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          <Stat label="LEAPS" value={posts.length} />
-          <Stat label="SPARKS" value={followingCount} />
-          <Stat label="STARS" value={0} />
+          <Stat label="LEAPS" value={followingCount} />
+          <Stat label="POSTS" value={posts.length} />
+          <Stat label="STARS" value={5} />
         </div>
 
-        {/* FOLLOWING SECTION */}
         <div className="pt-8">
           <div className="flex items-center gap-4 mb-6">
             <h2 className="text-2xl font-black text-white tracking-tight">

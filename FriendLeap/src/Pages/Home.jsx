@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getMockUsers, getMockPosts } from "../services/Mock";
-import { getRealUsers,  } from "../services/User";
-
+import { getRealUsers } from "../services/User";
 import Button from "../components/common/Button";
 import Post from "./Post";
 import PostCard from "../components/post/PostCard";
@@ -213,6 +212,16 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
     );
   }
 
+  const handleDeletePost = async (postId) => {
+  if (!window.confirm("Are you sure you want to delete this leap?")) return;
+
+  setPosts((prevPosts) => {
+    const updatedPosts = prevPosts.filter((post) => post.id !== postId);    
+    localforage.setItem(`posts_${currentUser.id}`, updatedPosts);
+    return updatedPosts;
+  });
+};
+
   return (
     <div className="min-h-screen pt-12 pb-20 px-4 md:px-8 max-w-[1600px] mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_350px] gap-8">
@@ -239,7 +248,7 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
                     {currentUser?.mood && <span className="text-sm">{currentUser.mood.emoji}</span>}
                   </div>
                   <p className="text-white/30 text-sm font-bold truncate">
-                    @{currentUser?.username || "you"}.leap
+                    @{currentUser?.username}.leap
                   </p>
                 </div>
               </div>
@@ -306,7 +315,6 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
           </nav>
         </aside>
 
-        {/* Center Column: Feed */}
         <main className="space-y-8 animate-in fade-in duration-1000">
           <MoodStoriesBar users={visibleUsers} />
           <MoodFilter activeMood={activeMood} onMoodChange={setActiveMood} />
@@ -335,13 +343,11 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
           </div>
         </main>
 
-        {/* Right Column: Trending */}
         <aside className="hidden xl:block animate-in slide-in-from-right-8 duration-700">
           <TrendingSidebar />
         </aside>
       </div>
 
-      {/* Post Modal Overlay */}
       {isPostOpen && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
           <div
@@ -357,7 +363,6 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
         </div>
       )}
 
-      {/* Following Modal */}
       {showFollowingModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="glass-card rounded-[40px] w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">
