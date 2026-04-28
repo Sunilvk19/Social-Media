@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Messages from "./Messages";
 import { getMockUsers } from "../../services/Mock"; 
 import { getRealUsers } from "../../services/User";
+import { sendNotification } from "../../services/Notification";
 
 const Chat = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -103,6 +104,15 @@ const Chat = () => {
 
     try {
       const res = await axios.post("http://localhost:5000/messages", newMessage);
+      
+      // Notify recipient
+      sendNotification({
+        userId: selectedUser.id,
+        senderId: currentUser.id,
+        type: "message",
+        content: `sent you a message: "${text.substring(0, 20)}..."`
+      });
+
       // Immediately update local state for better responsiveness
       setMessages((prev) => [...prev, res.data]);
     } catch (er) {

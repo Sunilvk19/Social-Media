@@ -33,6 +33,7 @@ function Post({ onPostCreated, onCancel }) {
   const [user, setUser] = useState(null);
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [selectedMood, setSelectedMood] = useState('spark');
   const fileInputRef = useRef(null);
   const workerRef = useRef(null);
@@ -40,7 +41,7 @@ function Post({ onPostCreated, onCancel }) {
 
   const MAX_CHARS = 180;
 
-  const optimizeImage = (file, maxWidth = 1080, quality = 0.8) => {
+  const optimizeImage = (file, maxWidth = 1080, quality = 0.95) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       const im = new Image();
@@ -90,24 +91,32 @@ function Post({ onPostCreated, onCancel }) {
     if (!globalWorker) {
       globalWorker = new Worker(
         new URL("../workers/CaptionWorker.js", import.meta.url),
+        { type: "module" }
       );
     }
     
     workerRef.current = globalWorker;
 
     const handleWorkerMessage = (e) => {
+      // Handle progress messages separately
+      if (e.data.type === 'download_progress') {
+        setProgress(Math.round(e.data.progress));
+        return;
+      }
+
       const { success, data, requestId, error } = e.data;
       if (requestId !== requestIdRef.current) return;
       
       if (success && data?.caption) {
         setName(data.caption.slice(0, MAX_CHARS));
       } else if (!success) {
-        console.error("Caption error: ", error?.message);
-        if (error?.message && !error.message.toLowerCase().includes("pipeline")) {
+        console.error("Caption error: ", error);
+        if (error && !error.toLowerCase().includes("pipeline")) {
           alert("Failed to generate caption. Please try again.");
         }
       }
       setIsGenerating(false);
+      setProgress(0); // Reset progress on finish
     };
 
     workerRef.current.addEventListener("message", handleWorkerMessage);
@@ -247,6 +256,8 @@ function Post({ onPostCreated, onCancel }) {
           <div className="absolute -inset-1 bg-linear-to-r from-rose-500 to-indigo-500 rounded-[30px] blur opacity-20 group-focus-within/input:opacity-40 transition-opacity duration-500"></div>
           <div className="relative bg-brand-dark border border-white/10 rounded-[28px] overflow-hidden">
             <textarea
+              id="post-caption"
+              name="post-caption"
               value={name}
               onChange={(e) => setName(e.target.value.slice(0, MAX_CHARS))}
               placeholder="What's leaping in your mind?"
@@ -288,7 +299,9 @@ function Post({ onPostCreated, onCancel }) {
             className={`flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-full text-white/70 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-30 ${isGenerating ? 'animate-pulse' : ''}`}
           >
             <FontAwesomeIcon icon={faWandMagicSparkles} className="text-purple-400" />
-            {isGenerating ? "Thinking..." : "Smart caption"}
+            {isGenerating 
+              ? (progress > 0 ? `Loading... ${progress}%` : "Thinking...") 
+              : "Smart caption"}
           </Button>
           <Button
             onClick={handleSurpriseMe}
