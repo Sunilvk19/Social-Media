@@ -241,14 +241,12 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
                   </div>
                 </div>
                 <div className="flex flex-col truncate">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-xl font-black text-white truncate">
-                      {currentUser?.firstName || "Sunil"}
-                    </h2>
-                    {currentUser?.mood && <span className="text-sm">{currentUser.mood.emoji}</span>}
-                  </div>
+                  <h2 className="text-xl font-black text-white truncate">
+                    {currentUser?.firstName} 
+                    {currentUser?.lastName}
+                  </h2>
                   <p className="text-white/30 text-sm font-bold truncate">
-                    @{currentUser?.username}.leap
+                    @{currentUser?.firstName}.leap
                   </p>
                 </div>
               </div>
