@@ -155,12 +155,6 @@ const Profile = () => {
         </div>
 
         {/* PROFILE CARD */}
-        <div className="bg-linear-to-tr from-purple-500 to-purple-500/20 backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
-          {/* Subtle Glow */}
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full"></div>
-
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* AVATAR SECTION */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full"></div>
 
