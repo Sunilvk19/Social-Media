@@ -49,12 +49,12 @@ const Explore = () => {
         <div className="max-w-7xl mx-auto space-y-10">
       
         <div className="flex justify-start">
-            <button 
+            <Button 
               onClick={() => navigate("/home")} 
               className="text-gray-500 bg-white border border-gray-200 px-4 py-2 rounded-xl hover:text-indigo-600 transition-all font-bold uppercase tracking-widest text-xs shadow-sm"
             >
               ← Back to Home
-            </button>
+            </Button>
         </div>
         
           <div className="relative max-w-xl mx-auto mb-6">
@@ -64,7 +64,7 @@ const Explore = () => {
               placeholder="Search people, posts, tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-3 w-full bg-white/5 backdrop-blur-sm border border-gray-200 text-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 focus:bg-white/10 transition-all shadow-sm"
+              className="pl-10 pr-4 py-3 w-full bg-white/90 text-gray-900 placeholder:text-gray-400 border border-gray-200 text-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 focus:bg-white transition-all shadow-sm"
             />
             {searchQuery && (
               <Button

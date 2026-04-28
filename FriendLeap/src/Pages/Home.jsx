@@ -17,6 +17,7 @@ import {
   faStar,
   faUser,
   faTimes,
+  faMessage,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
@@ -164,6 +165,27 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
     fetchUsersData();
   }, [navigate]);
 
+ 
+  useEffect(() => {
+    const handleMoodUpdate = (e) => {
+      const updatedUser = e.detail;
+      setCurrentUser(updatedUser);
+      setUsers((prev) => {
+        const exists = prev.some((u) => String(u.id) === String(updatedUser.id));
+        if (exists) {
+          return prev.map((u) =>
+            String(u.id) === String(updatedUser.id) ? { ...u, mood: updatedUser.mood } : u
+          );
+        }
+        return [...prev, updatedUser];
+      });
+    };
+    window.addEventListener("moodUpdated", handleMoodUpdate);
+    return () => window.removeEventListener("moodUpdated", handleMoodUpdate);
+  }, []);
+
+
+
   const handleNewPost = (newPost) => {
     setPosts((prev) => {
       const updated = [newPost, ...prev];
@@ -284,21 +306,16 @@ const Home = ({ isPostOpen, setIsPostOpen }) => {
           </div>
           <nav className="glass-card rounded-[40px] p-4 flex flex-col gap-1">
             {[
-              { icon: faCompass, label: "Discover", color: "text-cyan-400" },
-              { icon: faFire, label: "Trending", color: "text-orange-500" },
-              { icon: faUsers, label: "Circle", color: "text-indigo-400", },
-              { icon: faStar, label: "Saved Sparks", color: "text-amber-400" },
-              {
-                icon: faUser,
-                label: "Your profile",
-                onClick: () => navigate("/profile"),
-                color: "text-rose-400",
-              },
+              { icon: faCompass, label: "Settings", color: "text-cyan-400" },
+              { icon: faFire, label: "Trending", onClick: () => navigate("/explore"),color: "text-orange-500" },
+              { icon: faUsers, label: "Circless",onClick: () => navigate("/circle"), color: "text-indigo-400" },
+              { icon: faMessage, label: "Messages",onClick: () => navigate("/messages"), color: "text-indigo-400" },
+              { icon: faUser, label: "Your profile", onClick: () => navigate("/profile"), color: "text-rose-400" },
             ].map((item, index) => (
               <Button
                 key={index}
                 onClick={item.onClick}
-                className="flex items-center gap-5 p-5 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/10 hover:bg-white/5 transition-all group w-full text-left"
+                className="flex items-center gap-5 p-5 rounded-[30px] bg-transparent backdrop-blur-2xl border border-white/10 hover:bg-white/5 transition-all group w-full text-left"
               >
                 <div
                   className={`${item.color} text-xl group-hover:scale-125 transition-transform duration-300`}

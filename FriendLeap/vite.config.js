@@ -16,22 +16,26 @@ export default defineConfig({
     ignored: ['**/db.json']
   },
   proxy: {
-    "/api/huggingface": {
-      target: "https://huggingface.co",
-      changeOrigin: true,
-      rewrite: (path) =>
-        path.replace(/^\/api\/huggingface/, ""),
-      configure: (proxy) => {
-        proxy.on("proxyReq", (proxyReq) => {
-          if (process.env.HF_TOKEN) {
-            proxyReq.setHeader(
-              "Authorization",
-              `Bearer ${process.env.HF_TOKEN}`
-            );
-          }
-        });
-      },
+  "/api/huggingface": {
+    target: "https://huggingface.co",
+    changeOrigin: true,
+    rewrite: (path) => path.replace(/^\/api\/huggingface/, ""),
+    headers: {
+      'Accept': 'application/json',
+    },
+    configure: (proxy) => {
+      proxy.on("proxyReq", (proxyReq, req) => {
+        // Log to verify what's actually being requested
+        console.log('[Proxy] Requesting:', proxyReq.path);
+        if (process.env.HF_TOKEN) {
+          proxyReq.setHeader("Authorization", `Bearer ${process.env.HF_TOKEN}`);
+        }
+      });
+      proxy.on("proxyRes", (proxyRes, req) => {
+        console.log('[Proxy] Response status:', proxyRes.statusCode, req.url);
+      });
     },
   },
+}
 }
 })
