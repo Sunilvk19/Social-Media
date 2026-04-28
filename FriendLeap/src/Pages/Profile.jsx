@@ -1,25 +1,46 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import localforage from "localforage";
 import { getMockUsers } from "../services/Mock";
-import { getRealUsers } from "../services/User";
+import { getRealUsers, updateUserMood } from "../services/User";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
+import MoodBadge from "../components/mood/MoodBadge";
+import MoodPickerSheet from "../components/mood/MoodPickerSheet";
 
-const emojis = ["🚀", "🌸", "🎧", "🌙", "🌿", "⚡", "🍓", "🔥", "🌈", "🍋", "🦋", "🌊"];
+const emojis = [
+  "🚀",
+  "🌸",
+  "🎧",
+  "🌙",
+  "🌿",
+  "⚡",
+  "🍓",
+  "🔥",
+  "🌈",
+  "🍋",
+  "🦋",
+  "🌊",
+];
 const colors = [
-  "bg-pink-500", "bg-orange-400", "bg-purple-500",
-  "bg-teal-400", "bg-blue-400", "bg-yellow-400"
+  "bg-pink-500",
+  "bg-orange-400",
+  "bg-purple-500",
+  "bg-teal-400",
+  "bg-blue-400",
+  "bg-yellow-400",
 ];
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
   const [followingCount, setFollowingCount] = useState(0);
   const [followedUsers, setFollowedUsers] = useState([]);
   const [isFollowing, setIsFollowing] = useState({});
+  const [isMoodPickerOpen, setIsMoodPickerOpen] = useState(false);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
@@ -27,7 +48,7 @@ const Profile = () => {
     lastName: "",
     email: "",
     bio: "",
-    emoji: "🚀"
+    emoji: "🚀",
   });
 
   const [selectedColor, setSelectedColor] = useState("bg-pink-500");
@@ -37,32 +58,31 @@ const Profile = () => {
       const userData = await localforage.getItem("Current_user");
       if (!userData) return;
 
-      const [
-        postData,
-        profileData,
-        followingData,
-        mockUsers,
-        realUsers
-      ] = await Promise.all([
-        localforage.getItem(`posts_${userData.id}`),
-        localforage.getItem(`User_Profile_${userData.id}`),
-        localforage.getItem(`Following_state_${userData.id}`),
-        getMockUsers(),
-        getRealUsers().catch(() => [])
-      ]);
+      const [postData, profileData, followingData, mockUsers, realUsers] =
+        await Promise.all([
+          localforage.getItem(`posts_${userData.id}`),
+          localforage.getItem(`User_Profile_${userData.id}`),
+          localforage.getItem(`Following_state_${userData.id}`),
+          getMockUsers(),
+          getRealUsers().catch(() => []),
+        ]);
 
       setUser(userData);
 
       setEditData({
         ...userData,
-        bio: profileData?.bio || "Leaping between moments, collecting good vibes.",
-        emoji: profileData?.emoji || "🚀"
+        bio:
+          profileData?.bio || "Leaping between moments, collecting good vibes.",
+        emoji: profileData?.emoji || "🚀",
       });
 
-      if (profileData?.color) setSelectedColor(profileData.color);
+      const targetUserId = id || userData.id;
+      console.log(targetUserId);
+      const targetProfileData = await localforage.getItem(`User_Profile_${targetUserId}`);
+      if (targetProfileData?.color) setSelectedColor(targetProfileData.color);
 
       if (postData) {
-        setPosts(postData.filter(p => p.userId === userData.id));
+        setPosts(postData.filter((p) => p.userId === targetUserId));
       }
 
       const map = followingData || {};
@@ -71,18 +91,18 @@ const Profile = () => {
       setFollowingCount(Object.values(map).filter(Boolean).length);
 
       const allUsers = [...(realUsers || []), ...(mockUsers?.users || [])];
-      setFollowedUsers(allUsers.filter(u => map[u.id]));
+      setFollowedUsers(allUsers.filter((u) => map[u.id]));
     };
 
     load();
-  }, []);
+  }, [id]);
 
   const handleSave = async () => {
     const updatedUser = {
       ...user,
       firstName: editData.firstName,
       lastName: editData.lastName,
-      email: editData.email
+      email: editData.email,
     };
 
     await localforage.setItem("Current_user", updatedUser);
@@ -90,7 +110,7 @@ const Profile = () => {
     await localforage.setItem(`User_Profile_${user.id}`, {
       bio: editData.bio,
       emoji: editData.emoji,
-      color: selectedColor
+      color: selectedColor,
     });
 
     setUser(updatedUser);
@@ -98,31 +118,68 @@ const Profile = () => {
   };
 
   const handleFollowing = (id) => {
-    setIsFollowing(prev => {
+    setIsFollowing((prev) => {
       const updated = { ...prev, [id]: !prev[id] };
       localforage.setItem(`Following_state_${user.id}`, updated);
       return updated;
     });
   };
 
-  return (
-    <div className="min-h-screen bg-linear-to-br from-purple-900 via-indigo-900 to-blue-900 text-white p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
+  const handleMoodSelect = async (moodData) => {
+    try {
+      const updatedUser = await updateUserMood(moodData);
+      setUser(updatedUser);
+    } catch (err) {
+      console.error("Failed to set mood:", err);
+    }
+  };
 
+  return (
+    <div className="min-h-screen bg-linear-to-br from-brand-dark to-cyan-400 text-white p-6">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* HEADER */}
         <div className="flex justify-between">
-          <Button onClick={() => navigate("/home")} className="text-white/60 bg-white/5 backdrop-blur-md border border-white/10 hover:text-white hover:border-cyan-500/20 hover:bg-cyan-500/10transition-colors font-bold uppercase tracking-widest text-xs">
+          <Button
+            onClick={() => navigate("/home")}
+            className="text-white/60 bg-white/5 backdrop-blur-md border border-white/10 hover:text-white hover:border-cyan-500/20 hover:bg-cyan-500/10 transition-colors font-bold uppercase tracking-widest text-xs"
+          >
             ← Back to Home
+          </Button>
+          <Button 
+            onClick={() => setIsMoodPickerOpen(true)}
+            className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all font-black uppercase tracking-widest text-[10px]"
+          >
+            <span className="text-lg">{user.mood?.emoji || "🎭"}</span>
+            {user.mood ? user.mood.label : "Set Mood"}
           </Button>
         </div>
 
+        {/* PROFILE CARD */}
+        <div className="bg-linear-to-tr from-purple-500 to-purple-500/20 backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+          {/* Subtle Glow */}
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full"></div>
+
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* AVATAR SECTION */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full"></div>
 
           <div className="flex flex-col md:flex-row gap-8">
 
             <div className="flex flex-col items-center gap-4">
-              <div className={`w-32 h-32 ${selectedColor} rounded-[32px] flex items-center justify-center text-5xl shadow-2xl border-4 border-white/10 transition-transform group-hover:scale-105 duration-500`}>
-                {editData.emoji}
+              <div className={`relative p-1.5 rounded-[38px] transition-all duration-500 shadow-2xl ${user.mood ? 'bg-linear-to-tr ' + user.mood.color : 'bg-white/10'}`}>
+                <div className={`w-32 h-32 ${selectedColor} rounded-[32px] flex items-center justify-center text-5xl border-4 border-brand-dark transition-transform group-hover:scale-105 duration-500 overflow-hidden`}>
+                  {user.image ? (
+                    <img src={user.image} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    editData.emoji
+                  )}
+                </div>
+                {user.mood && (
+                  <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-linear-to-br from-cyan-400 to-blue-400 border border-white/10 rounded-full flex items-center justify-center text-xl shadow-xl animate-in zoom-in duration-500">
+                    {user.mood.emoji}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -131,9 +188,12 @@ const Profile = () => {
                 <div className="flex-1">
                   {!isEditing ? (
                     <>
-                      <h2 className="text-3xl font-black text-white tracking-tight">
-                        {user.firstName} {user.lastName}
-                      </h2>
+                      <div className="flex items-center gap-3">
+                        <h2 className="text-3xl font-black text-white tracking-tight">
+                          {user.firstName} {user.lastName}
+                        </h2>
+                        <MoodBadge mood={user.mood} />
+                      </div>
                       <p className="text-cyan-400 font-bold text-sm mt-1">
                         {user.email}
                       </p>
@@ -142,30 +202,46 @@ const Profile = () => {
                     <div className="space-y-4 max-w-md">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black text-white/30 uppercase tracking-widest">First Name</label>
-                          <input
-                            type="text"
+                          <label className="text-[10px] font-black text-white/30 uppercase tracking-widest">
+                            First Name
+                          </label>
+                          <Input
                             value={editData.firstName || ""}
-                            onChange={(e) => setEditData({ ...editData, firstName: e.target.value })}
+                            onChange={(e) =>
+                              setEditData({
+                                ...editData,
+                                firstName: e.target.value,
+                              })
+                            }
                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all"
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black text-white/30 uppercase tracking-widest">Last Name</label>
-                          <input
+                          <label className="text-[10px] font-black text-white/30 uppercase tracking-widest">
+                            Last Name
+                          </label>
+                          <Input
                             type="text"
                             value={editData.lastName || ""}
-                            onChange={(e) => setEditData({ ...editData, lastName: e.target.value })}
+                            onChange={(e) =>
+                              setEditData({
+                                ...editData,
+                                lastName: e.target.value,
+                              })
+                            }
                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all"
                           />
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-black text-white/30 uppercase tracking-widest">Email Address</label>
-                        <input
-                          type="email"
+                        <label className="text-[10px] font-black text-white/30 uppercase tracking-widest">
+                          Email Address
+                        </label>
+                        <Input
                           value={editData.email || ""}
-                          onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                          onChange={(e) =>
+                            setEditData({ ...editData, email: e.target.value })
+                          }
                           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all"
                         />
                       </div>
@@ -199,7 +275,9 @@ const Profile = () => {
               </div>
 
               <div className="mt-8">
-                <label className="text-[10px] font-black text-white/30 uppercase tracking-widest">About Me</label>
+                <label className="text-[10px] font-black text-white/30 uppercase tracking-widest">
+                  About Me
+                </label>
                 {!isEditing ? (
                   <p className="mt-2 text-white/70 font-medium leading-relaxed max-w-2xl">
                     {editData.bio}
@@ -226,9 +304,11 @@ const Profile = () => {
                 <div className="grid md:grid-cols-2 gap-10 mt-10 pt-10 border-t border-white/5 animate-in fade-in slide-in-from-top-4 duration-500">
                   {/* EMOJI SELECTOR */}
                   <div>
-                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-4">Choose your Vibe</p>
+                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-4">
+                      Choose your Vibe
+                    </p>
                     <div className="flex flex-wrap gap-2.5">
-                      {emojis.map(e => (
+                      {emojis.map((e) => (
                         <button
                           key={e}
                           onClick={() => setEditData({ ...editData, emoji: e })}
@@ -245,9 +325,11 @@ const Profile = () => {
                   </div>
 
                   <div>
-                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-4">Aura Color</p>
+                    <p className="text-[10px] font-black text-white/10 uppercase tracking-widest mb-4">
+                      Aura Color
+                    </p>
                     <div className="flex flex-wrap gap-3">
-                      {colors.map(c => (
+                      {colors.map((c) => (
                         <button
                           key={c}
                           onClick={() => setSelectedColor(c)}
@@ -274,7 +356,9 @@ const Profile = () => {
 
         <div className="pt-8">
           <div className="flex items-center gap-4 mb-6">
-            <h2 className="text-2xl font-black text-white tracking-tight">Your Connections</h2>
+            <h2 className="text-2xl font-black text-white tracking-tight">
+              Your Connections
+            </h2>
             <span className="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black text-white/40 tracking-widest">
               {followedUsers.length} TOTAL
             </span>
@@ -282,23 +366,29 @@ const Profile = () => {
 
           {followedUsers.length === 0 ? (
             <div className="bg-white/5 border border-white/5 rounded-[32px] p-20 text-center">
-               <div className="text-4xl mb-4 opacity-20">🏜️</div>
-               <p className="text-white/30 font-bold">No connections yet. Go explore the world!</p>
+              <div className="text-4xl mb-4 opacity-20">🏜️</div>
+              <p className="text-white/30 font-bold">
+                No connections yet. Go explore the world!
+              </p>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
-              {followedUsers.map(u => (
+              {followedUsers.map((u) => (
                 <div
                   key={u.id}
                   className="bg-white/5 backdrop-blur-md border border-white/5 p-6 rounded-[32px] flex justify-between items-center group/item hover:bg-white/10 transition-all"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl">👤</div>
+                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl">
+                      👤
+                    </div>
                     <div>
                       <p className="font-black text-white">
                         {u.firstName} {u.lastName}
                       </p>
-                      <p className="text-[10px] font-bold text-white/30 tracking-wider">@{u.username || u.firstName.toLowerCase()}</p>
+                      <p className="text-[10px] font-bold text-white/30 tracking-wider">
+                        @{u.username || u.firstName.toLowerCase()}
+                      </p>
                     </div>
                   </div>
 
@@ -313,15 +403,21 @@ const Profile = () => {
             </div>
           )}
         </div>
-
       </div>
+      <MoodPickerSheet 
+        open={isMoodPickerOpen} 
+        onClose={() => setIsMoodPickerOpen(false)} 
+        onSelect={handleMoodSelect} 
+      />
     </div>
   );
 };
 
 const Stat = ({ label, value }) => (
   <div className="bg-white/5 backdrop-blur-lg rounded-[32px] p-8 border border-white/5 hover:bg-white/10 transition-all group">
-    <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2 group-hover:text-cyan-400 transition-colors">{label}</p>
+    <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2 group-hover:text-cyan-400 transition-colors">
+      {label}
+    </p>
     <p className="text-4xl font-black text-white">{value}</p>
   </div>
 );

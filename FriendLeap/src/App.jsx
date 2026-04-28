@@ -59,7 +59,9 @@ const App = () => {
         <Route
           path="/profile"
           element={
+            <Layout onCreatePost={handleOpenPost}>
               <Profile />
+            </Layout>
           }
         />
       </Routes>
