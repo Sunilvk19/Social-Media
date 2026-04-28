@@ -5,7 +5,15 @@
       "lastName": "kumar",
       "email": "sunil123@gmail.com",
       "password": "$2b$10$x0XC/OOBC0z0xvqt0khCeeC1E9lPpVwh6fBYoQNd8sS4g54c2JBt2",
-      "id": "BjaLfb8xc6Q"
+      "id": "BjaLfb8xc6Q",
+      "mood": {
+        "emoji": "😊",
+        "label": "Happy",
+        "color": "from-amber-200 via-yellow-400 to-amber-500",
+        "bg": "bg-yellow-400/10",
+        "visibility": "Friends",
+        "updatedAt": "2026-04-28T05:37:02.574Z"
+      }
     },
     {
       "id": "user_0ocvsfw_1776841208708",
@@ -19,7 +27,15 @@
       "lastName": "Sunil",
       "email": "maha@gmail.com",
       "password": "$2b$10$w94lNeHbvHTPOV8XVAZG3.iDUZf8HeuoY6LdBiniJPeLdgApiZ/x.",
-      "id": "-iUJwwYOVhM"
+      "id": "-iUJwwYOVhM",
+      "mood": {
+        "emoji": "🧘",
+        "label": "Calm",
+        "color": "from-teal-400 to-emerald-500",
+        "bg": "bg-cyan-400/10",
+        "visibility": "Friends",
+        "updatedAt": "2026-04-27T11:05:01.663Z"
+      }
     }
   ],
   "messages": [

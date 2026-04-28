@@ -8,6 +8,9 @@ import {
   faPaperclip,
   faFaceSmile,
   faTrash,
+  faVoicemail,
+  faMicrophoneAltSlash,
+  faMicrophoneLines,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -40,9 +43,13 @@ const Messages = ({
       .includes(searchQuery.toLowerCase()),
   );
 
+  const handleVoiceNote = () => {
+    
+  }
+
   return (
-    <div className="flex h-[calc(100vh-80px)] bg-gray-50/50 font-sans gap-6 p-6 overflow-hidden">
-      <div className="w-96 flex flex-col bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden animate-in slide-in-from-left-8 duration-700">
+    <div className="flex h-[calc(100vh-80px)] bg-linear-to-br from-purple-900 via-indigo-900 to-blue-900 text-white  font-sans gap-6 p-6 overflow-hidden">
+      <div className="w-96 flex flex-col bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden animate-in slide-in-from-left-8 duration-700">
         <div className="p-6 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-black text-gray-900 tracking-tight">
@@ -59,7 +66,7 @@ const Messages = ({
               placeholder="Search contacts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="rounded-2xl border-gray-100 bg-gray-50/50 py-3 group-focus-within:bg-white transition-all shadow-none"
+              className="rounded-2xl border-gray-100 bg-gray-50/50 py-3 group-focus-within:bg-gray-800 text-black transition-all shadow-none"
             />
           </div>
         </div>
@@ -112,7 +119,7 @@ const Messages = ({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4 text-gray-300">
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-lg rounded-2xl flex items-center justify-center mb-4 text-gray-300">
                 <FontAwesomeIcon icon={faSearch} size="lg" />
               </div>
               <p className="text-gray-400 text-sm font-medium leading-relaxed">
@@ -125,7 +132,7 @@ const Messages = ({
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-500">
+      <div className="flex-1 flex flex-col bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-500">
         {selectedUser ? (
           <>
             <div className="px-8 py-5 flex items-center justify-between border-b border-gray-50 bg-white/80 backdrop-blur-md sticky top-0 z-20">
@@ -170,7 +177,7 @@ const Messages = ({
 
             <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30 custom-scrollbar">
               <div className="flex justify-center mb-8">
-                <span className="px-4 py-1.5 bg-white shadow-sm border border-gray-100 rounded-full text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                <span className="px-4 py-1.5 bg-white/20 backdrop-blur-lg shadow-sm border border-gray-900 rounded-full text-[11px] font-bold text-gray-400 uppercase tracking-widest">
                   Today
                 </span>
               </div>
@@ -211,22 +218,24 @@ const Messages = ({
             <div className="p-6 bg-white border-t border-gray-50">
               <div className="flex items-center gap-4 bg-gray-50/50 rounded-2xl p-2 pr-2 border border-gray-100 focus-within:border-indigo-200 focus-within:bg-white transition-all">
                 <div className="flex gap-1 pl-2">
-                  <button className="w-10 h-10 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-white transition-all">
+                  <Button className="w-10 h-10 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-white transition-all">
                     <FontAwesomeIcon icon={faPaperclip} />
-                  </button>
-                  <button className="w-10 h-10 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-white transition-all">
+                  </Button>
+                  <Button className="w-10 h-10 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-white transition-all">
                     <FontAwesomeIcon icon={faFaceSmile} />
-                  </button>
+                  </Button>
                 </div>
 
-                <input
+                <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={`Type a message to ${selectedUser.firstName}...`}
                   className="flex-1 bg-transparent border-none py-3 px-2 text-gray-800 text-[15px] focus:outline-none"
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 />
-
+                <Button className="bg-indigo-50 hover:border-green-500 ">
+                  {selectedUser.isMick ? <FontAwesomeIcon icon={faMicrophoneLines} color="black"/> : <FontAwesomeIcon icon={faMicrophoneLines} />}
+                </Button>
                 <Button
                   onClick={handleSend}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-6 py-3 shadow-lg shadow-indigo-100 transition-all hover:scale-[1.02] active:scale-[0.98] border-none font-bold text-sm"

@@ -58,7 +58,7 @@ const Explore = () => {
     : posts;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-linear-to-br from-brand-dark to-cyan-400 p-4 md:p-8">
       {loading ? (
         <div className="flex justify-center items-center h-64 text-xl font-bold text-gray-400 animate-pulse">
           Loading Content...
@@ -72,19 +72,19 @@ const Explore = () => {
               placeholder="Search people, posts, tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-3 w-full bg-white border border-gray-200 text-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 focus:bg-white transition-all shadow-sm"
+              className="pl-10 pr-4 py-3 w-full bg-white/5 backdrop-blur-sm border border-gray-200 text-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 focus:bg-white/10 transition-all shadow-sm"
             />
             {searchQuery && (
-              <button
+              <Button
                 onClick={() => setSearchQuery("")}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm font-bold transition-colors"
               >
                 ✕
-              </button>
+              </Button>
             )}
           </div>
           <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 drop-shadow-sm">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 drop-shadow-sm">
               Discover People
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -115,20 +115,20 @@ const Explore = () => {
             </div>
           </section>
           <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 drop-shadow-sm">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 drop-shadow-sm">
               Trending Posts
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between gap-4 hover:shadow-lg transition-shadow cursor-pointer"
+                  className="bg-linear-to-b from-red-100 to-cyan-200 p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between gap-4 hover:shadow-lg transition-shadow cursor-pointer"
                 >
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 line-clamp-2 mb-2 hover:text-indigo-600 transition-colors">
+                    <h3 className="text-lg font-bold text-gray-900 line-clamp-2 mb-2 hover:text-brand-light transition-colors">
                       {post.title}
                     </h3>
-                    <p className="text-sm text-gray-600 line-clamp-3">
+                    <p className="text-sm text-gray-800 line-clamp-3">
                       {post.body}
                     </p>
                   </div>
@@ -137,13 +137,13 @@ const Explore = () => {
                       {post.tags?.slice(0, 2).map((tag, index) => (
                         <span
                           key={index}
-                          className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md"
+                          className="text-[10px] font-bold uppercase tracking-wider text-gray-800 bg-indigo-50 px-2 py-1 rounded-md"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
-                    <div className="flex gap-3 text-xs font-bold text-gray-400">
+                    <div className="flex gap-3 text-xs font-bold text-gray-900">
                       <span className="flex items-center gap-1">
                         👍 {post.reactions?.likes || 0}
                       </span>
