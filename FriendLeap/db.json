@@ -12,7 +12,7 @@
         "color": "from-amber-200 via-yellow-400 to-amber-500",
         "bg": "bg-yellow-400/10",
         "visibility": "Friends",
-        "updatedAt": "2026-04-28T05:37:02.574Z"
+        "updatedAt": "2026-04-28T09:04:00.241Z"
       }
     },
     {
@@ -66,6 +66,13 @@
       "receiverId": "user_0ocvsfw_1776841208708",
       "timestamp": "2026-04-26T09:04:41.418Z",
       "id": "cXGTbEMN6d8"
+    },
+    {
+      "text": "hi",
+      "senderId": "BjaLfb8xc6Q",
+      "receiverId": 4,
+      "timestamp": "2026-04-28T08:39:50.274Z",
+      "id": "HuNTawbVO5I"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

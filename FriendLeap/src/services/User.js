@@ -1,9 +1,11 @@
 import axios from "axios";
 import localforage from "localforage";
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 export const getRealUsers = async () => {
   try{
-    const res = await axios.get("http://localhost:5000/users");
+    const res = await axios.get(`${BASE_URL}/users`);
     return res.data;
   } catch (error) {
     console.log("Error fetching users", error);
@@ -17,14 +19,15 @@ export const updateUserMood = async (moodData) => {
     const currentUser = await localforage.getItem('Current_user');
     if (!currentUser) throw new Error("No user logged in");
 
-    // Update server (json-server)
-    const response = await axios.patch(`http://localhost:5000/users/${currentUser.id}`, {
+    const response = await axios.patch(`${BASE_URL}/users/${currentUser.id}`, {
       mood: moodData
     });
 
-    // Update local storage
     const updatedUser = { ...currentUser, mood: response.data.mood };
     await localforage.setItem('Current_user', updatedUser);
+
+    // Notify Navbar and Home to sync the new mood instantly
+    window.dispatchEvent(new CustomEvent("moodUpdated", { detail: updatedUser }));
     
     return updatedUser;
   } catch (error) {

@@ -26,11 +26,19 @@ const Navbar = ({ onCreatePost = () => {} }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userData = await localforage.getItem(`Current_User`);
+      const userData = await localforage.getItem("Current_user");
       setCurrentUser(userData);
     };
     fetchUser();
   }, []);
+
+  // Sync mood changes from any page (e.g. Profile)
+  useEffect(() => {
+    const onMoodUpdated = (e) => setCurrentUser(e.detail);
+    window.addEventListener("moodUpdated", onMoodUpdated);
+    return () => window.removeEventListener("moodUpdated", onMoodUpdated);
+  }, []);
+
 
   const handleNotification = () => {
     navigate("/notification");
@@ -50,12 +58,12 @@ const Navbar = ({ onCreatePost = () => {} }) => {
   const handleMoodChange = async (moodData) => {
     if (!currentUser) return;
     try {
-      await axios.patch(`${import.meta.env.VITE_BASE_URL}/users/${currentUser.id}`, {
+      await axios.patch(`${import.meta.env.VITE_API_URL}/users/${currentUser.id}`, {
         mood: moodData,
       });
 
       const updatedUser = { ...currentUser, mood: moodData };
-      await localforage.setItem("Current_User", updatedUser);
+      await localforage.setItem("Current_user", updatedUser);
 
       const profile = await localforage.getItem(
         `User_Profile_${currentUser.id}`,
@@ -69,20 +77,13 @@ const Navbar = ({ onCreatePost = () => {} }) => {
 
       setCurrentUser(updatedUser);
       setIsMoodPickerOpen(false);
+      // Notify other components that mood changed
+      window.dispatchEvent(new CustomEvent("moodUpdated", { detail: updatedUser }));
     } catch (error) {
       console.error("Mood change error: ", error);
       alert("Failed to change mood. Please try again.");
     }
   };
-
-  const navLinks = [
-    { name: "Home", path: "/home" },
-    { name: "Explore", path: "/explore" },
-    { name: "Messages", path: "/messages" },
-  ];
-
- 
-
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50 bg-brand-dark/60 backdrop-blur-xl border-b border-white/5 transition-all duration-300">

@@ -4,18 +4,18 @@ env.allowRemoteModels = true;
 env.useFSCache = true;
 
 
-env.remoteHost = '/api/huggingface';
-
 let caption = null;
 
 self.onmessage = async (e) => {
     const { image, requestId } = e.data;
 
+
     try {
         if (!caption) {
             caption = await pipeline(
                 'image-to-text',
-                'Xenova/vit-gpt2-image-captioning' 
+                'Xenova/vit-gpt2-image-captioning',
+                { revision: 'main', dtype: 'fp32'}
             );
         }
 

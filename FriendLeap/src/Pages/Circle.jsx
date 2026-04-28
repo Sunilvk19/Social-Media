@@ -5,6 +5,7 @@ import Input from "../components/common/Input";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { getRealUsers } from "../services/User";
 import { useNavigate } from "react-router-dom";
+import Button from "../components/common/Button";
 
 const Circle = () => {
   const navigate = useNavigate();
@@ -85,15 +86,15 @@ const Circle = () => {
               placeholder="Search people..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-3 w-full bg-white border border-gray-200 text-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm"
+              className="pl-10 pr-4 py-3 w-full bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 text-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:bg-white transition-all shadow-sm"
             />
             {searchQuery && (
-              <button
+              <Button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm font-bold"
+                className="absolute hover:border border-gray-200 bg-white/50 backdrop-blur-lg right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm font-bold"
               >
                 ✕
-              </button>
+              </Button>
             )}
           </div>
 
@@ -118,15 +119,15 @@ const Circle = () => {
                       <span className="text-sm font-bold text-gray-800 truncate">
                         {user.firstName} {user.lastName}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {user.followers || 0} followers
-                      </span>
-                      <button 
+                      {/* <span className="text-xs text-gray-500">
+                        {user.followers} followers
+                      </span> */}
+                      <Button 
                         onClick={() => handleLeap(user.id)} 
                         className="mt-2 w-fit text-xs font-semibold bg-indigo-600 text-white px-4 py-1.5 rounded-full hover:bg-indigo-700 transition-colors"
                       >
                         Leap
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))}
